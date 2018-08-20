@@ -17,7 +17,7 @@ build:
       cache_repo: true
 
     - wercker/maven:
-      goals: clean install
+      goals: clean deploy
       settings: .maven.xml
       profiles: release-github,release-blackbelt
       cache_repo: true
