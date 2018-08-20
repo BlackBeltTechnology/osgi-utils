@@ -656,7 +656,7 @@
                 </snapshotRepository>
                 <repository>
                     <id>blackbelt-nexus-distribution</id>
-                    <url>https://nexus.blackbelt.cloud/repository/maven-juds-release/</url>
+                    <url>https://nexus.blackbelt.cloud/repository/maven-judo-release/</url>
                 </repository>
             </distributionManagement>
         </profile>
