@@ -22,7 +22,6 @@ build:
       maven_opts: -DnewVersion=${VERSION_FROM_POM_BASE_VERSION}-${VERSION_FROM_GIT_TAG_CURRENT_BRANCH_VALID_NAME}-${VERSION_FROM_GIT_TAG_COMMIT_COUNT}
       cache_repo: true
 
-
     - wercker/maven:
       goals: clean deploy
       settings: .maven.xml
@@ -137,11 +136,11 @@ release:
              git tag -a v$VERSION_FROM_POM_BASE_VERSION -m "Release v$VERSION_FROM_POM_BASE_VERSION"
 
     - script:
-        name: increase version number
+        name: increase version number (parent)
         code: "mvn build-helper:parse-version versions:set -DnewVersion=\\${parsedVersion.majorVersion}.\\${parsedVersion.minorVersion}.\\${parsedVersion.nextIncrementalVersion}-SNAPSHOT -DgenerateBackupPoms=false -f ./parent/pom.xml  -Dmaven.repo.local=$WERCKER_CACHE_DIR/.m2"
 
-     - script:
-        name: increase version number
+    - script:
+        name: increase version number (reactor)
         code: "mvn build-helper:parse-version versions:set -DnewVersion=\\${parsedVersion.majorVersion}.\\${parsedVersion.minorVersion}.\\${parsedVersion.nextIncrementalVersion}-SNAPSHOT -DgenerateBackupPoms=false -f ./pom.xml  -Dmaven.repo.local=$WERCKER_CACHE_DIR/.m2"
 
     - script:
