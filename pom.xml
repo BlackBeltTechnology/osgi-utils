@@ -74,12 +74,6 @@
                             <tag>${project.version}</tag>
                             <fileSets>
                                 <fileSet>
-                                    <directory>lang/target</directory>
-                                    <includes>
-                                        <include>*.jar</include>
-                                    </includes>
-                                </fileSet>
-                                <fileSet>
                                     <directory>osgi-api/target</directory>
                                     <includes>
                                         <include>*.jar</include>
