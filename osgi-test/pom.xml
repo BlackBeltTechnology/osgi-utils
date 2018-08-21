@@ -44,13 +44,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>lang</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-
         <!-- for backward compatibility only! -->
         <dependency>
             <groupId>org.apache.felix</groupId>

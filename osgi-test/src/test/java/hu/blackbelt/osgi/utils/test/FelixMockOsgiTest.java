@@ -1,8 +1,7 @@
-package hu.blackbelt.judo.framework.osgi.test;
+package hu.blackbelt.osgi.utils.test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import hu.blackbelt.osgi.utils.test.MockOsgi;
 import lombok.Getter;
 import lombok.Setter;
 import org.junit.Test;
@@ -17,7 +16,6 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
-import static hu.blackbelt.osgi.utils.lang.util.AnnotationUtil.getAllAnnotations;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -96,20 +94,20 @@ public class FelixMockOsgiTest {
 
     @Test
     public void referenceIterableFromReferencesAnnotationTest() {
-        org.apache.felix.scr.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromFelixReferencesAnnotation().apply(getAllAnnotations(T1.class, org.apache.felix.scr.annotations.References.class).get(0))).get(0);
+        org.apache.felix.scr.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromFelixReferencesAnnotation().apply(MockOsgi.getAllAnnotations(T1.class, org.apache.felix.scr.annotations.References.class).get(0))).get(0);
     }
 
     @Test
     public void referenceIterableFromReferencesAnnotationInheritenceTest() {
-        org.apache.felix.scr.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromFelixReferencesAnnotation().apply(getAllAnnotations(T1C.class, org.apache.felix.scr.annotations.References.class).get(0))).get(0);
+        org.apache.felix.scr.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromFelixReferencesAnnotation().apply(MockOsgi.getAllAnnotations(T1C.class, org.apache.felix.scr.annotations.References.class).get(0))).get(0);
     }
 
 
     @Test
     public void callBindAndUnbindForReferenceTest() {
         T1 t1 = new T1();
-        org.apache.felix.scr.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromFelixReferencesAnnotation().apply(getAllAnnotations(T1.class, org.apache.felix.scr.annotations.References.class).get(0))).get(0);
-        org.apache.felix.scr.annotations.Reference i2ref = getAllAnnotations(T1.class, org.apache.felix.scr.annotations.Reference.class).get(0);
+        org.apache.felix.scr.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromFelixReferencesAnnotation().apply(MockOsgi.getAllAnnotations(T1.class, org.apache.felix.scr.annotations.References.class).get(0))).get(0);
+        org.apache.felix.scr.annotations.Reference i2ref = MockOsgi.getAllAnnotations(T1.class, org.apache.felix.scr.annotations.Reference.class).get(0);
         assertEquals(I1.class, i1ref.referenceInterface());
         assertEquals(I2.class, i2ref.referenceInterface());
 
@@ -128,8 +126,8 @@ public class FelixMockOsgiTest {
     @Test
     public void callBindAndUnbindForReferenceInheritenceTest() {
         T1C t1c = new T1C();
-        org.apache.felix.scr.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromFelixReferencesAnnotation().apply(getAllAnnotations(T1C.class, org.apache.felix.scr.annotations.References.class).get(0))).get(0);
-        org.apache.felix.scr.annotations.Reference i2ref = getAllAnnotations(T1C.class, org.apache.felix.scr.annotations.Reference.class).get(0);
+        org.apache.felix.scr.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromFelixReferencesAnnotation().apply(MockOsgi.getAllAnnotations(T1C.class, org.apache.felix.scr.annotations.References.class).get(0))).get(0);
+        org.apache.felix.scr.annotations.Reference i2ref = MockOsgi.getAllAnnotations(T1C.class, org.apache.felix.scr.annotations.Reference.class).get(0);
         assertEquals(I1.class, i1ref.referenceInterface());
         assertEquals(I2.class, i2ref.referenceInterface());
 
