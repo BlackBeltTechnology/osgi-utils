@@ -1,6 +1,5 @@
 package hu.blackbelt.osgi.utils.internal.impl;
 
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import hu.blackbelt.osgi.utils.osgi.api.ConfigurationCallback;
@@ -23,14 +22,9 @@ import org.osgi.service.component.annotations.Reference;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -58,7 +52,6 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
     @Reference
     ConfigurationAdmin configurationAdmin;
 
-    BundleContext bundleContext;
     SynchronousConfigurationListener synchronousConfigurationListener;
     ServiceRegistration<SynchronousConfigurationListener> synchronousConfigurationListenerServiceRegistration;
 
@@ -78,8 +71,7 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
     };
 
     @Activate
-    public final void activate(BundleContext bundleContextPar) {
-        this.bundleContext = bundleContextPar;
+    public final void activate(BundleContext bundleContext) {
         this.synchronousConfigurationListener = new SynchronousConfigurationListener() {
             @Override
             public void configurationEvent(ConfigurationEvent event) {
@@ -91,7 +83,7 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
             }
         };
         this.synchronousConfigurationListenerServiceRegistration =
-                this.bundleContext.registerService(SynchronousConfigurationListener.class, synchronousConfigurationListener, new Hashtable<>());
+                bundleContext.registerService(SynchronousConfigurationListener.class, synchronousConfigurationListener, new Hashtable<>());
 
         // Apply for existing configurationsByKey
         List<Configuration> allConfigurations = getAllConfigurations();
@@ -101,7 +93,7 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
     }
 
     @Deactivate
-    public final void deactivate(BundleContext bundleContextPar) {
+    public final void deactivate() {
         synchronousConfigurationListenerServiceRegistration.unregister();
     }
 
@@ -161,10 +153,11 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
 
 
     private void configurationChangedInternal(ConfigurationEvent event) throws IOException {
+        log.trace("Configuration event: PID={}, factory PID={}, type={}, keys={}", event.getPid(), event.getFactoryPid(), event.getType(), event.getReference() != null ? event.getReference().getPropertyKeys() : null);
         final Map<Object, Consumer<ConfigurationInfo>> callbacks;
         ConfigurationInfo configurationInfo = null;
         if ((event.getType() == CM_UPDATED || event.getType() == CM_LOCATION_CHANGED) && !configurationPropertiesByPid.containsKey(event.getPid())) {
-            configurationInfo = transformConfigurationToConfigurationInfo(CREATE).apply(configurationAdmin.getConfiguration(event.getPid()));
+            configurationInfo = transformConfigurationToConfigurationInfo(CREATE).apply(getConfiguration(event.getPid()));
             configurationPropertiesByPid.put(event.getPid(), configurationInfo.getProperties());
             configurationFactoryPidByPid.put(event.getPid(), configurationInfo.getConfigurationFactoryPid());
             callbacks = createCallbacks;
@@ -175,10 +168,10 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
             } else if (event.getType() == CM_UPDATED) {
                 eventType = UPDATE;
             }
-            configurationInfo = transformConfigurationToConfigurationInfo(eventType).apply(configurationAdmin.getConfiguration(event.getPid()));
+            configurationInfo = transformConfigurationToConfigurationInfo(eventType).apply(getConfiguration(event.getPid()));
             configurationPropertiesByPid.put(event.getPid(), configurationInfo.getProperties());
             callbacks = updateCallbacks;
-        } else if (event.getType() == CM_DELETED || event.getType() == CM_DELETED) {
+        } else if (event.getType() == CM_DELETED) {
             configurationInfo = new ConfigurationInfo(event.getPid(), event.getFactoryPid(), configurationPropertiesByPid.get(event.getPid()), DELETE);
             configurationPropertiesByPid.remove(event.getPid());
             configurationFactoryPidByPid.remove(event.getPid());
@@ -192,6 +185,15 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
                     .filter(configurationFilter(entry.getKey()))
                     .forEach(entry.getValue());
         }
+    }
+
+    private Configuration getConfiguration(String pid) {
+        try {
+            return Arrays.stream(configurationAdmin.listConfigurations(null)).filter(c -> c.getPid().equals(pid)).findFirst().get();
+        } catch (Exception ex) {
+            log.error("Invalid configuration filter", ex);
+        }
+        return null;
     }
 
     /**

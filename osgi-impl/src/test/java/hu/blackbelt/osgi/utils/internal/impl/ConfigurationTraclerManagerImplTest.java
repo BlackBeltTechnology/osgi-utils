@@ -199,7 +199,7 @@ public class ConfigurationTraclerManagerImplTest {
         when(event.getType()).thenReturn(CM_UPDATED);
         when(event.getPid()).thenReturn(PID1);
         when(event.getFactoryPid()).thenReturn(FACTORY_PID1);
-        when(configurationAdminMock.getConfiguration(PID1)).thenReturn(configuration1Mock);
+        when(configurationAdminMock.listConfigurations(null)).thenReturn(new Configuration[]{configuration1Mock});
 
         trackerManager.synchronousConfigurationListener.configurationEvent(event);
 
