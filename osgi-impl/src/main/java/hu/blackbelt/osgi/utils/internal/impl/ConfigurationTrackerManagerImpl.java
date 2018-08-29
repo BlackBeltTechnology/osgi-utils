@@ -1,7 +1,6 @@
 package hu.blackbelt.osgi.utils.internal.impl;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import hu.blackbelt.osgi.utils.osgi.api.ConfigurationCallback;
 import hu.blackbelt.osgi.utils.osgi.api.ConfigurationInfo;
 import hu.blackbelt.osgi.utils.osgi.api.ConfigurationInfo.ConfigEventType;
@@ -155,12 +154,18 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
     private void configurationChangedInternal(ConfigurationEvent event) throws IOException {
         log.trace("Configuration event: PID={}, factory PID={}, type={}, keys={}", event.getPid(), event.getFactoryPid(), event.getType(), event.getReference() != null ? event.getReference().getPropertyKeys() : null);
         final Map<Object, Consumer<ConfigurationInfo>> callbacks;
-        ConfigurationInfo configurationInfo = null;
+        final ConfigurationInfo configurationInfo;
         if ((event.getType() == CM_UPDATED || event.getType() == CM_LOCATION_CHANGED) && !configurationPropertiesByPid.containsKey(event.getPid())) {
-            configurationInfo = transformConfigurationToConfigurationInfo(CREATE).apply(getConfiguration(event.getPid()));
-            configurationPropertiesByPid.put(event.getPid(), configurationInfo.getProperties());
-            configurationFactoryPidByPid.put(event.getPid(), configurationInfo.getConfigurationFactoryPid());
-            callbacks = createCallbacks;
+            final Optional<Configuration> cfg = getConfiguration(event.getPid());
+            if (cfg.isPresent()) {
+                configurationInfo = transformConfigurationToConfigurationInfo(CREATE).apply(cfg.get());
+                configurationPropertiesByPid.put(event.getPid(), configurationInfo.getProperties());
+                configurationFactoryPidByPid.put(event.getPid(), configurationInfo.getConfigurationFactoryPid());
+                callbacks = createCallbacks;
+            } else {
+                log.warn("Configuration not found: {}", event.getPid());
+                return;
+            }
         } else if ((event.getType() == CM_UPDATED || event.getType() == CM_LOCATION_CHANGED) && configurationPropertiesByPid.containsKey(event.getPid())) {
             ConfigEventType eventType = null;
             if (event.getType() == CM_LOCATION_CHANGED) {
@@ -168,16 +173,22 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
             } else if (event.getType() == CM_UPDATED) {
                 eventType = UPDATE;
             }
-            configurationInfo = transformConfigurationToConfigurationInfo(eventType).apply(getConfiguration(event.getPid()));
-            configurationPropertiesByPid.put(event.getPid(), configurationInfo.getProperties());
-            callbacks = updateCallbacks;
+            final Optional<Configuration> cfg = getConfiguration(event.getPid());
+            if (cfg.isPresent()) {
+                configurationInfo = transformConfigurationToConfigurationInfo(eventType).apply(cfg.get());
+                configurationPropertiesByPid.put(event.getPid(), configurationInfo.getProperties());
+                callbacks = updateCallbacks;
+            } else {
+                log.warn("Configuration not found: {}", event.getPid());
+                return;
+           }
         } else if (event.getType() == CM_DELETED) {
             configurationInfo = new ConfigurationInfo(event.getPid(), event.getFactoryPid(), configurationPropertiesByPid.get(event.getPid()), DELETE);
             configurationPropertiesByPid.remove(event.getPid());
             configurationFactoryPidByPid.remove(event.getPid());
             callbacks = deleteCallbacks;
         } else {
-            callbacks = ImmutableMap.of();
+            return;
         }
 
         for (Map.Entry<Object, Consumer<ConfigurationInfo>> entry : callbacks.entrySet()) {
@@ -187,13 +198,13 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
         }
     }
 
-    private Configuration getConfiguration(String pid) {
+    private Optional<Configuration> getConfiguration(String pid) {
         try {
-            return Arrays.stream(configurationAdmin.listConfigurations(null)).filter(c -> c.getPid().equals(pid)).findFirst().get();
+            return Arrays.stream(configurationAdmin.listConfigurations(null)).filter(c -> c.getPid().equals(pid)).findFirst();
         } catch (Exception ex) {
             log.error("Invalid configuration filter", ex);
         }
-        return null;
+        return Optional.empty();
     }
 
     /**
