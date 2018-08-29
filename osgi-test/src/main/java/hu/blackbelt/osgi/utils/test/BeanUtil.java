@@ -1,7 +1,6 @@
-package hu.blackbelt.osgi.utils.lang.util;
+package hu.blackbelt.osgi.utils.test;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import lombok.SneakyThrows;
 
 import javax.annotation.Nullable;
@@ -11,7 +10,8 @@ import java.lang.reflect.Method;
 /**
  * Bean functions to work with an instance of object
  */
-public final class BeanUtil {
+public class BeanUtil {
+
     private BeanUtil() {
     }
 
@@ -52,22 +52,4 @@ public final class BeanUtil {
             }
         };
     }
-
-    /**
-     * Returns a String predicate where the given strings matches with the given prefix.
-     * @param prefix
-     * @param <T>
-     * @return
-     */
-    public static <T> Predicate<String> startWith(final String prefix) {
-        return new Predicate<String>() {
-            @Nullable
-            @Override
-            public boolean apply(@Nullable String input) {
-                return input.startsWith(prefix);
-            }
-        };
-    }
-
-
 }

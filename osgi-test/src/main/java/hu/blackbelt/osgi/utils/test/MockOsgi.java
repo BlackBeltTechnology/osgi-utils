@@ -1,25 +1,34 @@
 package hu.blackbelt.osgi.utils.test;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
-import hu.blackbelt.osgi.utils.lang.util.AnnotationUtil;
+import com.google.common.collect.ImmutableList;
+import javassist.ClassClassPath;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.NotFoundException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.reflections.ReflectionUtils;
+import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.MethodAnnotationsScanner;
 
 import javax.annotation.Nullable;
+import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.google.common.base.Optional.fromNullable;
+import static com.google.common.base.Optional.presentInstances;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.emptyToNull;
@@ -27,11 +36,8 @@ import static com.google.common.collect.FluentIterable.from;
 import static com.google.common.collect.ImmutableList.copyOf;
 import static com.google.common.collect.ImmutableList.of;
 import static com.google.common.collect.Iterables.concat;
-import static hu.blackbelt.osgi.utils.lang.util.BeanUtil.callMethod;
-import static hu.blackbelt.osgi.utils.lang.util.BeanUtil.setField;
-import static hu.blackbelt.osgi.utils.lang.util.ClassUtil.getFieldsAnnotatedWith;
-import static hu.blackbelt.osgi.utils.lang.util.ClassUtil.getMethodsAnnotatedWith;
-import static hu.blackbelt.osgi.utils.lang.util.ReflectionUtil.methodParameterType;
+import static hu.blackbelt.osgi.utils.test.BeanUtil.callMethod;
+import static hu.blackbelt.osgi.utils.test.BeanUtil.setField;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -202,15 +208,15 @@ public final class MockOsgi {
             while (!found && clz != null) {
                 // Class references (standard OSGi)
                 for (org.osgi.service.component.annotations.Reference reference : from(concat(
-                        from(AnnotationUtil.getAllAnnotations(clz, org.osgi.service.component.annotations.Component.class))
+                        from(getAllAnnotations(clz, org.osgi.service.component.annotations.Component.class))
                                 .transformAndConcat(referenceIterableFromStandardComponentAnnotation())))) {
                     callBindForStandardReference(object, instance).apply(reference);
                     found = true;
                 }
                 // Class references (Felix SCR)
                 for (org.apache.felix.scr.annotations.Reference reference : from(concat(
-                        from(AnnotationUtil.getAllAnnotations(clz, org.apache.felix.scr.annotations.Reference.class)),
-                        from(AnnotationUtil.getAllAnnotations(clz, org.apache.felix.scr.annotations.References.class))
+                        from(getAllAnnotations(clz, org.apache.felix.scr.annotations.Reference.class)),
+                        from(getAllAnnotations(clz, org.apache.felix.scr.annotations.References.class))
                                 .transformAndConcat(referenceIterableFromFelixReferencesAnnotation())))) {
                     callBindForFelixReference(object, instance).apply(reference);
                     found = true;
@@ -316,4 +322,126 @@ public final class MockOsgi {
         }
     }
 
+    /**
+     * Returns all fields in the given class which have the given annotation.
+     * @param cl Class find with in
+     * @param annotation Annotation to find
+     * @return Iterator of fields have the annotation
+     */
+
+    private static Iterable<Field> getFieldsAnnotatedWith(final Class<?> cl, Class<? extends Annotation> annotation) {
+        return from(new Reflections(cl, new FieldAnnotationsScanner(), startWith(cl.getName())).getFieldsAnnotatedWith(annotation));
+    }
+
+    /**
+     * Returns all methods in the given class which have the given annotation.
+     * @param cl Class find with in
+     * @param annotation Annotation to find
+     * @return Iterator of methods have the annotation
+     */
+    private static Iterable<Method> getMethodsAnnotatedWith(final Class<?> cl, Class<? extends Annotation> annotation) {
+        return from(new Reflections(cl, new MethodAnnotationsScanner(), startWith(cl.getName())).getMethodsAnnotatedWith(annotation));
+    }
+
+    /**
+     * Returns a String predicate where the given strings matches with the given prefix.
+     * @param prefix
+     * @param <T>
+     * @return
+     */
+    private static <T> Predicate<String> startWith(final String prefix) {
+        return new Predicate<String>() {
+            @Nullable
+            @Override
+            public boolean apply(@Nullable String input) {
+                return input.startsWith(prefix);
+            }
+        };
+    }
+
+    private static <T> Predicate<Method> methodParameterType(final String name, final Class<T> cl) {
+        return new Predicate<Method>() {
+            @Nullable
+            @Override
+            public boolean apply(@Nullable Method input) {
+                return input.getName().equals(name) && input.getParameterTypes().length == 1 && input.getParameterTypes()[0].isAssignableFrom(cl);
+            }
+        };
+    }
+
+    /**
+     * It returns all instance of given annotation in the given class with all interfaces and super types.
+     * The list element in the list is the current class annotation, the order of annotations is the
+     * order of inheritance.
+     *
+     * @param cl Class to scanClass to scan
+     * @param annotationClass Annotation class find for
+     * @param <T> The type of annotation
+     * @return The annotation instances find for or empty if it is not presented
+     */
+    static <T extends Annotation> List<T> getAllAnnotations(Class<?> cl, Class<T> annotationClass) {
+        checkNotNull(cl);
+        checkNotNull(annotationClass);
+        checkArgument(Annotation.class.isAssignableFrom(annotationClass), "The given annotation class parameter is not an annotation");
+        Retention retention = annotationClass.getAnnotation(Retention.class);
+        RetentionPolicy retentionPolicy = RetentionPolicy.CLASS;
+        if (retention != null) {
+            retentionPolicy = retention.value();
+        }
+
+        checkArgument(retentionPolicy != RetentionPolicy.SOURCE, "The CLASS and the RUNTIME retention policy is allowed");
+
+        List<T> ret = new ArrayList<>();
+
+        Iterable<T> annotation;
+        if (retentionPolicy == RetentionPolicy.CLASS) {
+            annotation = FluentIterable.from(getTypeAnnotations(cl)).filter(annotationClass);
+        } else {
+            annotation = presentInstances(of(fromNullable(cl.getAnnotation(annotationClass))));
+        }
+
+        if (annotation.iterator().hasNext()) {
+            ret.addAll(from(annotation).toList());
+        }
+        Class<?> superclass = cl.getSuperclass();
+        if (superclass != null) {
+            ret.addAll(0, getAllAnnotations(superclass, annotationClass));
+        }
+        Class<?>[] interfaces = cl.getInterfaces();
+        for (Class<?> iface : interfaces) {
+            ret.addAll(0, getAllAnnotations(iface, annotationClass));
+        }
+        return ImmutableList.copyOf(ret);
+    }
+
+    /**
+     * Returns all annotations of the given class.
+     * @param cl Class find with in
+     * @return Iterator of annotations
+     */
+    @SneakyThrows({ ClassNotFoundException.class, NotFoundException.class })
+    static Iterable<Annotation> getTypeAnnotations(final Class<?> cl) {
+        ClassPool classPool = ClassPool.getDefault();
+        classPool.insertClassPath(new ClassClassPath(cl));
+        CtClass ctClass = classPool.get(cl.getName());
+
+        return FluentIterable
+                .of(ctClass.getAnnotations())
+                .transform(cast(Annotation.class));
+    }
+
+    /**
+     * Creates a function which will cast the input to the provided class.
+     *
+     * @param resultClass class which will be used for the class
+     * @return function
+     */
+    static <T> Function<Object, T> cast(final Class<T> resultClass) {
+        return new Function<Object, T>() {
+            @Override
+            public T apply(Object input) {
+                return resultClass.cast(input);
+            }
+        };
+    }
 }

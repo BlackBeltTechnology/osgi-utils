@@ -1,11 +1,13 @@
 package hu.blackbelt.osgi.utils.osgi.api;
 
-import hu.blackbelt.osgi.utils.osgi.api.BundleUtil;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
 import org.osgi.framework.Bundle;
 
-import static hu.blackbelt.osgi.utils.lang.util.Dictionaries.dictionary;
+import java.util.Dictionary;
+import java.util.Hashtable;
+
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -50,4 +52,18 @@ public class BundleUtilTest {
         return bundle;
     }
 
+    private static <K, V> Dictionary<K, V> dictionary(K key, V value) {
+        Dictionary<K, V> result = new Hashtable<>();
+        result.put(key, value);
+        return result;
+    }
+
+    private static <K, V> Dictionary<K, V> dictionary(Object... keysAndValues) {
+        checkArgument(keysAndValues.length % 2 == 0, "Equal number of key-value pairs expected.");
+        Dictionary<K, V> result = new Hashtable<>();
+        for (int i = 0; i < keysAndValues.length; i += 2) {
+            result.put((K) keysAndValues[i], (V) keysAndValues[i + 1]);
+        }
+        return result;
+    }
 }
