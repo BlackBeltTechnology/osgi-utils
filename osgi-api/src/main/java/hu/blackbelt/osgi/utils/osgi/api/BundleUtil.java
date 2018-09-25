@@ -1,8 +1,15 @@
 package hu.blackbelt.osgi.utils.osgi.api;
 
 import com.google.common.base.Splitter;
+import com.google.common.io.Files;
 import org.osgi.framework.Bundle;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
 import java.util.List;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -66,4 +73,63 @@ public final class BundleUtil {
     public static boolean hasResources(Bundle bundle, String path, String filePattern, boolean recursive) {
         return bundle.findEntries(path, filePattern, recursive) != null;
     }
+
+
+    /**
+     * Copy the given files from bundle to the bundle's persistent storage.
+     * @param bundle The bundle extracted from
+     * @param targetName The target path in persistent storage extract to
+     * @param fileInBundle The file extracted from the bundle
+     * @return The file handle of the target file
+     * @throws IOException
+     */
+    public static File copyBundleFileToPersistentStorage(Bundle bundle, String targetName, String fileInBundle) throws IOException {
+        File outFile = bundle.getDataFile(targetName);
+
+        InputStream initialStream = bundle.getEntry(fileInBundle).openStream();
+        byte[] buffer = new byte[initialStream.available()];
+        initialStream.read(buffer);
+        Files.write(buffer, outFile);
+        return outFile;
+    }
+
+    /**
+     * Copy the given folder from bundle to the bundle's persistent storage.
+     * @param bundle The bundle extract from
+     * @param targetName The target path in persistent storage extract to
+     * @param pathInBundle The patch extracted from the bundle
+     * @param filePattern The file pattern to filter. If null or * all files is extracted
+     * @param recurse Recurse extracting, all subdirectories extracted too.
+     * @return The file handle of persistent storage extracted to
+     * @throws IOException
+     */
+    public static File copyBundlePathToPersistentStorage(Bundle bundle, String targetName, String pathInBundle, String filePattern, boolean recurse) throws IOException {
+        File outFile = bundle.getDataFile("");
+
+        String pathName = pathInBundle;
+        if (!pathName.startsWith("/")) {
+            pathName = "/" + pathName;
+        }
+        Enumeration<URL> paths = bundle.findEntries(pathInBundle, filePattern, recurse);
+        while (paths.hasMoreElements()) {
+            URL u = paths.nextElement();
+
+            InputStream initialStream = null;
+            try {
+                initialStream = u.openStream();
+            } catch (FileNotFoundException fe) {
+            }
+
+            if (initialStream != null) {
+                byte[] buffer = new byte[initialStream.available()];
+                initialStream.read(buffer);
+                String relFileName = u.getFile().substring(pathName.length());
+                File targetFile = new File(outFile.getAbsoluteFile() + File.separator + targetName + File.separator + relFileName);
+                targetFile.getParentFile().mkdirs();
+                Files.write(buffer, targetFile);
+            }
+        }
+        return outFile;
+    }
+
 }
