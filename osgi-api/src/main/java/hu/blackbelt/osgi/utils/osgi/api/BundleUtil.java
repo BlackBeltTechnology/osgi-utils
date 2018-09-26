@@ -1,13 +1,16 @@
 package hu.blackbelt.osgi.utils.osgi.api;
 
 import com.google.common.base.Splitter;
+import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import org.osgi.framework.Bundle;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
@@ -85,12 +88,12 @@ public final class BundleUtil {
      */
     public static File copyBundleFileToPersistentStorage(Bundle bundle, String targetName, String fileInBundle) throws IOException {
         File outFile = bundle.getDataFile(targetName);
-
-        InputStream initialStream = bundle.getEntry(fileInBundle).openStream();
-        byte[] buffer = new byte[initialStream.available()];
-        initialStream.read(buffer);
-        Files.write(buffer, outFile);
-        return outFile;
+        try (
+                InputStream is = bundle.getEntry(fileInBundle).openStream();
+                OutputStream os = new FileOutputStream(outFile)) {
+            ByteStreams.copy(is, os);
+            return outFile;
+        }
     }
 
     /**
@@ -114,19 +117,16 @@ public final class BundleUtil {
         while (paths.hasMoreElements()) {
             URL u = paths.nextElement();
 
-            InputStream initialStream = null;
-            try {
-                initialStream = u.openStream();
-            } catch (FileNotFoundException fe) {
-            }
-
-            if (initialStream != null) {
-                byte[] buffer = new byte[initialStream.available()];
-                initialStream.read(buffer);
+            try (InputStream is = u.openStream()) {
                 String relFileName = u.getFile().substring(pathName.length());
                 File targetFile = new File(outFile.getAbsoluteFile() + File.separator + targetName + File.separator + relFileName);
-                targetFile.getParentFile().mkdirs();
-                Files.write(buffer, targetFile);
+                if (is.available() > 0) {
+                    targetFile.getParentFile().mkdirs();
+                    try (OutputStream os = new FileOutputStream(targetFile)) {
+                        ByteStreams.copy(is, os);
+                    }
+                }
+            } catch (FileNotFoundException e) {
             }
         }
         return outFile;
