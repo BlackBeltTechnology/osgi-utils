@@ -12,8 +12,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -130,6 +133,38 @@ public final class BundleUtil {
             }
         }
         return outFile;
+    }
+
+
+    /**
+     * Parese the given manifest header entries to a list of entries. The format of entry is key1_1=val1_1;key1_2=val2_1,key2_1=val2_1;key2_1=val2_2,
+     * where the coma separated entries will be one entry in list, and the key values came as the map entries. If the header is not found returns null.
+     * @param bundle The bundle which is used to gen header
+     * @param headerEntryName
+     * @return list of entries when header is presented or null when header is not found
+     */
+    public static List<Map<String, String>> getHeaderEntries(Bundle bundle, String headerEntryName) {
+
+        if (!hasHeader(bundle, headerEntryName)) {
+            return null;
+        }
+        List<Map<String, String>> headerEntries = new ArrayList<>();
+        for (String psmModel : getHeaderValues(bundle, headerEntryName)) {
+            Map<String, String> entry = new HashMap<>();
+            if (psmModel != null && !"".equals(psmModel.trim())) {
+                for (String keyVal : psmModel.split(";")) {
+                    if (keyVal != null && !"".equals(keyVal.trim())) {
+                        String[] keyAndVal = keyVal.split("=");
+                        if (keyAndVal.length != 2) {
+                            throw new IllegalArgumentException(headerEntryName + "header have to be in the following format: key1_1=val1_1;key1_2=val2_1,key2_1=val2_1;key2_1=val2_2");
+                        }
+                        entry.put(keyAndVal[0].trim(), keyAndVal[1].trim());
+                    }
+                }
+                headerEntries.add(entry);
+            }
+        }
+        return headerEntries;
     }
 
 }
