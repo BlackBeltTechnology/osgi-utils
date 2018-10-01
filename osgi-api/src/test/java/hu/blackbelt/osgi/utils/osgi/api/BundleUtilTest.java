@@ -1,20 +1,30 @@
 package hu.blackbelt.osgi.utils.osgi.api;
 
+import com.google.common.collect.ImmutableMap;
 import org.hamcrest.MatcherAssert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.osgi.framework.Bundle;
 
 import java.util.Dictionary;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class BundleUtilTest {
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Test
     public void testHasHeadersTrue() {
         MatcherAssert.assertThat(BundleUtil.hasHeader(header("name", "value"), "name"), is(true));
@@ -34,6 +44,37 @@ public class BundleUtilTest {
         MatcherAssert.assertThat(BundleUtil.getHeaderValues(header("name", "value1, value2,,"), "name"), contains("value1", "value2", "", ""));
         MatcherAssert.assertThat(BundleUtil.getHeaderValues(header("name", "value1, value2,,,"), "name"), contains("value1", "value2", "", "", ""));
     }
+
+    @Test
+    public void testInvalidHeaderEntries() {
+        thrown.expect(IllegalArgumentException.class);
+        BundleUtil.getHeaderEntries(header("name", "value1"), "name");
+    }
+
+    @Test
+    public void testHeaderEntries() {
+        MatcherAssert.assertThat(
+                BundleUtil.getHeaderEntries(header("name", "key=value"), "name").stream().map(Map::entrySet).collect(Collectors.toList()),
+                hasItems(
+                        hasItems(ImmutableMap.of("key", "value").entrySet().toArray(new Map.Entry[1]))
+                ));
+
+        MatcherAssert.assertThat(
+                BundleUtil.getHeaderEntries(header("name", "key=value;key2=value2"), "name").stream().map(Map::entrySet).collect(Collectors.toList()),
+                hasItem(
+                        hasItems(ImmutableMap.of("key", "value", "key2", "value2").entrySet().toArray(new Map.Entry[2]))
+                ));
+
+        MatcherAssert.assertThat(
+                BundleUtil.getHeaderEntries(header("name", "key=value;key2=value2,key3=value3;key4=value4"), "name").stream().map(Map::entrySet).collect(Collectors.toList()),
+                hasItems(
+                        hasItems(ImmutableMap.of("key", "value", "key2", "value2").entrySet().toArray(new Map.Entry[2])),
+                        hasItems(ImmutableMap.of("key3", "value3", "key4", "value4").entrySet().toArray(new Map.Entry[2]))
+                ));
+
+    }
+
+
     @Test
     public void testHeaderValuesEmpty() {
         MatcherAssert.assertThat(BundleUtil.getHeaderValues(emptyHeader(), "name1"), hasSize(0));
