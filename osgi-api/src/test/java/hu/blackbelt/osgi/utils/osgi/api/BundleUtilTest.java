@@ -72,6 +72,14 @@ public class BundleUtilTest {
                         hasItems(ImmutableMap.of("key3", "value3", "key4", "value4").entrySet().toArray(new Map.Entry[2]))
                 ));
 
+        MatcherAssert.assertThat(
+                BundleUtil.getHeaderEntries(header("name", "file=model/northwind.psm;version=1.0.0-SNAPSHOT;name=Northwind;checksum=831725387bbfca86abdac6c382cd8326;meta-version=\"[1.0,1.1)\""), "name").stream().map(Map::entrySet).collect(Collectors.toList()),
+                hasItems(
+                        hasItems(ImmutableMap.of("file", "model/northwind.psm", "version", "1.0.0-SNAPSHOT", "name", "Northwind", "checksum", "831725387bbfca86abdac6c382cd8326", "meta-version", "\"[1.0,1.1)\"").entrySet().toArray(new Map.Entry[5]))
+                ));
+
+
+
     }
 
 
