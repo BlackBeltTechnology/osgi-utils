@@ -24,7 +24,9 @@ import static com.google.common.collect.Lists.newArrayList;
  * Bundle related utils (eg: header query).
  */
 public final class BundleUtil {
-    public static final String HEADER_VALUE_SEPARATOR = ",";
+    public static final String HEADER_VALUE_SEPARATOR  = ",(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
+    public static final String HEADER_PARAM_SEPARATOR  = ";(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
+    public static final String HEADER_KEYVAL_SEPARATOR = "=(?=(?:[^\\\"]*\\\"[^\\\"]*\\\")*[^\\\"]*$)";
 
     private BundleUtil() {
     }
@@ -50,7 +52,7 @@ public final class BundleUtil {
         String value = bundle.getHeaders().get(headerName);
         if (value != null) {
             results = newArrayList(Splitter
-                    .on(HEADER_VALUE_SEPARATOR)
+                    .on(",")
                     .trimResults()
                     .split(value));
         }
@@ -149,12 +151,13 @@ public final class BundleUtil {
             return null;
         }
         List<Map<String, String>> headerEntries = new ArrayList<>();
-        for (String psmModel : getHeaderValues(bundle, headerEntryName)) {
+        String value = bundle.getHeaders().get(headerEntryName);
+        for (String psmModel : value.split(HEADER_VALUE_SEPARATOR)) {
             Map<String, String> entry = new HashMap<>();
             if (psmModel != null && !"".equals(psmModel.trim())) {
-                for (String keyVal : psmModel.split(";")) {
+                for (String keyVal : psmModel.split(HEADER_PARAM_SEPARATOR)) {
                     if (keyVal != null && !"".equals(keyVal.trim())) {
-                        String[] keyAndVal = keyVal.split("=");
+                        String[] keyAndVal = keyVal.split(HEADER_KEYVAL_SEPARATOR);
                         if (keyAndVal.length != 2) {
                             throw new IllegalArgumentException(headerEntryName + "header have to be in the following format: key1_1=val1_1;key1_2=val2_1,key2_1=val2_1;key2_1=val2_2");
                         }
