@@ -6,7 +6,9 @@
     <version>1.0.7-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>OSGi utils parent project</name>
-    
+
+    <description>OSGi utils</description>
+
     <url>http://github.com/BlackBeltTechnology/osgi-utils</url>
     
     <issueManagement>
