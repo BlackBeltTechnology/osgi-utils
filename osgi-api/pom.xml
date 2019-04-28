@@ -5,7 +5,7 @@
         <groupId>hu.blackbelt.osgi.utils</groupId>
         <artifactId>parent</artifactId>
         <version>1.0.7-SNAPSHOT</version>
-        <relativePath>../parent</relativePath>
+        <relativePath>../</relativePath>
     </parent>
 
     <artifactId>osgi-api</artifactId>
