@@ -152,10 +152,10 @@ public final class BundleUtil {
         }
         List<Map<String, String>> headerEntries = new ArrayList<>();
         String value = bundle.getHeaders().get(headerEntryName);
-        for (String psmModel : value.split(HEADER_VALUE_SEPARATOR)) {
+        for (String headerKeyValue : value.split(HEADER_VALUE_SEPARATOR)) {
             Map<String, String> entry = new HashMap<>();
-            if (psmModel != null && !"".equals(psmModel.trim())) {
-                for (String keyVal : psmModel.split(HEADER_PARAM_SEPARATOR)) {
+            if (headerKeyValue != null && !"".equals(headerKeyValue.trim())) {
+                for (String keyVal : headerKeyValue.split(HEADER_PARAM_SEPARATOR)) {
                     if (keyVal != null && !"".equals(keyVal.trim())) {
                         String[] keyAndVal = keyVal.split(HEADER_KEYVAL_SEPARATOR);
                         if (keyAndVal.length != 2) {
