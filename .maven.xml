@@ -31,15 +31,6 @@
         
     </servers>
     
-    <mirrors>
-        <mirror>
-            <id>judong-nexus-mirror</id>
-            <name>judong-nexus-mirror</name>
-            <url>https://nexus.judo.technology/repository/maven-judong/</url>
-            <mirrorOf>*</mirrorOf>
-        </mirror>
-    </mirrors>
-    
     <profiles>
         <profile>
             <id>gpg</id>
