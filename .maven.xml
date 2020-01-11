@@ -28,8 +28,17 @@
             <username>${env.JUDONG_NEXUS_USERNAME}</username>
             <password>${env.JUDONG_NEXUS_PASSWORD}</password>
         </server>
-        
+
     </servers>
+    
+    <mirrors>
+        <mirror>
+            <id>judong-nexus-mirror</id>
+            <name>judong-nexus-mirror</name>
+            <url>https://nexus.judo.technology/repository/maven-judong/</url>
+            <mirrorOf>*</mirrorOf>
+        </mirror>
+    </mirrors>
     
     <profiles>
         <profile>
@@ -43,7 +52,6 @@
                 <gpg.passphrase>${env.GPG_PASSPHRASE}</gpg.passphrase>
             </properties>
         </profile>
-
         <profile>
             <id>ossrh</id>
             <activation>
