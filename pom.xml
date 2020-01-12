@@ -288,26 +288,7 @@
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>2.9</version>
             </plugin>
-            
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>regex-property</id>
-                        <goals>
-                            <goal>regex-property</goal>
-                        </goals>
-                        <configuration>
-                            <name>artifact.subPackage</name>
-                            <value>${project.artifactId}</value>
-                            <regex>-</regex>
-                            <replacement>.</replacement>
-                            <failIfNoMatch>false</failIfNoMatch>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
         </plugins>
         
         <pluginManagement>
@@ -371,8 +352,7 @@
                             <_metatypeannotations>*</_metatypeannotations>
                             <_include>${additional.manifest.file}</_include>
                             <Export-Package>
-                                ${project.groupId}.${artifact.subPackage};version=${project.version},
-                                ${project.groupId}.${artifact.subPackage}.*;version=${project.version}
+                                ${project.groupId}.*;version=${project.version}
                             </Export-Package>
                             <Import-Package>
                                 !javax.annotation,
