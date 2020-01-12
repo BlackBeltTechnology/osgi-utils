@@ -17,7 +17,7 @@
         <pax.exam.framework>felix</pax.exam.framework>
         <pax.exam.logging>none</pax.exam.logging>
         <felix.osgi.version>5.2.0</felix.osgi.version>
-        <exam.version>4.11.0</exam.version>
+        <exam.version>4.13.1</exam.version>
         <url.version>1.6.0</url.version>
     </properties>
 
