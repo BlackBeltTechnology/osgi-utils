@@ -3,7 +3,7 @@
     
     <groupId>hu.blackbelt.osgi.utils</groupId>
     <artifactId>parent</artifactId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.8</version>
     <packaging>pom</packaging>
     <name>OSGi utils parent project</name>
 
