@@ -1,10 +1,7 @@
 package hu.blackbelt.osgi.utils.test;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import javassist.ClassClassPath;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -12,6 +9,8 @@ import javassist.NotFoundException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
+import org.apache.felix.scr.annotations.Reference;
+import org.apache.felix.scr.annotations.References;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 import org.reflections.ReflectionUtils;
@@ -26,16 +25,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.base.Optional.presentInstances;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Strings.emptyToNull;
-import static com.google.common.collect.FluentIterable.from;
-import static com.google.common.collect.ImmutableList.copyOf;
-import static com.google.common.collect.ImmutableList.of;
-import static com.google.common.collect.Iterables.concat;
 import static hu.blackbelt.osgi.utils.test.BeanUtil.callMethod;
 import static hu.blackbelt.osgi.utils.test.BeanUtil.setField;
 import static org.mockito.Mockito.mock;
@@ -72,12 +68,12 @@ public final class MockOsgi {
         deactivate(object.getClass(), object, param);
     }
 
-    public static Function<org.apache.felix.scr.annotations.References, Iterable<org.apache.felix.scr.annotations.Reference>> referenceIterableFromFelixReferencesAnnotation() {
-        return new Function<org.apache.felix.scr.annotations.References, Iterable<org.apache.felix.scr.annotations.Reference>>() {
+    public static Function<References, Stream<Reference>> referenceIterableFromFelixReferencesAnnotation() {
+        return new Function<org.apache.felix.scr.annotations.References, Stream<org.apache.felix.scr.annotations.Reference>>() {
             @Nullable
             @Override
-            public Iterable<org.apache.felix.scr.annotations.Reference> apply(@Nullable org.apache.felix.scr.annotations.References input) {
-                return from(copyOf(input.value()));
+            public Stream<org.apache.felix.scr.annotations.Reference> apply(@Nullable org.apache.felix.scr.annotations.References input) {
+                return Stream.of(input.value());
             }
         };
     }
@@ -88,8 +84,8 @@ public final class MockOsgi {
             @Nullable
             @Override
             public Void apply(@Nullable org.apache.felix.scr.annotations.Reference reference) {
-                final String name = fromNullable(emptyToNull(reference.name())).get();
-                checkNotNull(emptyToNull(name), REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_NAME);
+                final Optional<String> name = Optional.ofNullable(reference.name()).filter(s -> !s.isEmpty());
+                checkNotNull(name.isPresent(), REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_NAME);
 
                 final Class<?> referenceInterface = reference.referenceInterface();
                 checkNotNull(referenceInterface, REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_REFERENCE_INTERFACE);
@@ -98,11 +94,11 @@ public final class MockOsgi {
                     return null;
                 }
 
-                final String bind = fromNullable(emptyToNull(reference.bind())).or("bind" + name);
-                for (Method m : from(ReflectionUtils.getAllMethods(object.getClass(),
-                        methodParameterType(bind, referenceInterface))).toList()) {
+                final String bind = Optional.ofNullable(reference.bind()).filter(s -> !s.isEmpty()).orElse("bind" + name.get());
+                ReflectionUtils.getAllMethods(object.getClass(),
+                        methodParameterType(bind, referenceInterface)).forEach(m -> {
                     callMethod(object, instance).apply(m);
-                }
+                });
                 return null;
             }
         };
@@ -113,8 +109,8 @@ public final class MockOsgi {
             @Nullable
             @Override
             public Void apply(@Nullable org.apache.felix.scr.annotations.Reference reference) {
-                final String name = fromNullable(emptyToNull(reference.name())).get();
-                checkNotNull(emptyToNull(name), REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_NAME);
+                final Optional<String> name = Optional.ofNullable(reference.name()).filter(s -> !s.isEmpty());
+                checkNotNull(name.isPresent(), REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_NAME);
 
                 final Class<?> referenceInterface = reference.referenceInterface();
                 checkNotNull(referenceInterface, REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_REFERENCE_INTERFACE);
@@ -123,22 +119,22 @@ public final class MockOsgi {
                     return null;
                 }
 
-                final String unbind = fromNullable(emptyToNull(reference.bind())).or("unbind" + name);
-                for (Method m : from(ReflectionUtils.getAllMethods(object.getClass(),
-                        methodParameterType(unbind, referenceInterface))).toList()) {
+                final String unbind = Optional.ofNullable(reference.bind()).filter(s -> !s.isEmpty()).orElse("unbind" + name.get());
+                ReflectionUtils.getAllMethods(object.getClass(),
+                        methodParameterType(unbind, referenceInterface)).forEach(m -> {
                     callMethod(object, instance).apply(m);
-                }
+                });
                 return null;
             }
         };
     }
 
-    public static Function<org.osgi.service.component.annotations.Component, Iterable<org.osgi.service.component.annotations.Reference>> referenceIterableFromStandardComponentAnnotation() {
-        return new Function<org.osgi.service.component.annotations.Component, Iterable<org.osgi.service.component.annotations.Reference>>() {
+    public static Function<org.osgi.service.component.annotations.Component, Stream<org.osgi.service.component.annotations.Reference>> referenceIterableFromStandardComponentAnnotation() {
+        return new Function<org.osgi.service.component.annotations.Component, Stream<org.osgi.service.component.annotations.Reference>>() {
             @Nullable
             @Override
-            public Iterable<org.osgi.service.component.annotations.Reference> apply(@Nullable org.osgi.service.component.annotations.Component input) {
-                return from(copyOf(input.reference()));
+            public Stream<org.osgi.service.component.annotations.Reference> apply(@Nullable org.osgi.service.component.annotations.Component input) {
+                return Stream.of(input.reference());
             }
         };
     }
@@ -149,8 +145,8 @@ public final class MockOsgi {
             @Nullable
             @Override
             public Void apply(@Nullable org.osgi.service.component.annotations.Reference reference) {
-                final String name = fromNullable(emptyToNull(reference.name())).get();
-                checkNotNull(emptyToNull(name), REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_NAME);
+                final Optional<String> name = Optional.ofNullable(reference.name()).filter(s -> !s.isEmpty());
+                checkNotNull(name.isPresent(), REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_NAME);
 
                 final Class<?> referenceInterface = reference.service();
                 checkNotNull(referenceInterface, REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_REFERENCE_INTERFACE);
@@ -159,11 +155,11 @@ public final class MockOsgi {
                     return null;
                 }
 
-                final String bind = fromNullable(emptyToNull(reference.bind())).or("bind" + name);
-                for (Method m : from(ReflectionUtils.getAllMethods(object.getClass(),
-                        methodParameterType(bind, referenceInterface))).toList()) {
+                final String bind = Optional.ofNullable(reference.bind()).filter(s -> !s.isEmpty()).orElse("bind" + name.get());
+                ReflectionUtils.getAllMethods(object.getClass(),
+                        methodParameterType(bind, referenceInterface)).forEach(m -> {
                     callMethod(object, instance).apply(m);
-                }
+                });
                 return null;
             }
         };
@@ -174,8 +170,8 @@ public final class MockOsgi {
             @Nullable
             @Override
             public Void apply(@Nullable org.osgi.service.component.annotations.Reference reference) {
-                final String name = fromNullable(emptyToNull(reference.name())).get();
-                checkNotNull(emptyToNull(name), REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_NAME);
+                final Optional<String> name = Optional.ofNullable(reference.name()).filter(s -> !s.isEmpty());
+                checkNotNull(name.isPresent(), REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_NAME);
 
                 final Class<?> referenceInterface = reference.service();
                 checkNotNull(referenceInterface, REFERENCE_IN_CLASS_LEVEL_HAVE_TO_CONTAIN_REFERENCE_INTERFACE);
@@ -184,11 +180,11 @@ public final class MockOsgi {
                     return null;
                 }
 
-                final String unbind = fromNullable(emptyToNull(reference.bind())).or("unbind" + name);
-                for (Method m : from(ReflectionUtils.getAllMethods(object.getClass(),
-                        methodParameterType(unbind, referenceInterface))).toList()) {
+                final String unbind = Optional.ofNullable(reference.bind()).filter(s -> !s.isEmpty()).orElse("unbind" + name.get());
+                ReflectionUtils.getAllMethods(object.getClass(),
+                        methodParameterType(unbind, referenceInterface)).forEach(m -> {
                     callMethod(object, instance).apply(m);
-                }
+                });
                 return null;
             }
         };
@@ -203,41 +199,34 @@ public final class MockOsgi {
 
         // Processing class @Reference and @References annotations
         for (Object instance : instances) {
-            boolean found = false;
+            AtomicBoolean found = new AtomicBoolean(false);
             Class<?> clz = object.getClass();
-            while (!found && clz != null) {
+            while (!found.get() && clz != null) {
                 // Class references (standard OSGi)
-                for (org.osgi.service.component.annotations.Reference reference : from(concat(
-                        from(getAllAnnotations(clz, org.osgi.service.component.annotations.Component.class))
-                                .transformAndConcat(referenceIterableFromStandardComponentAnnotation())))) {
-                    callBindForStandardReference(object, instance).apply(reference);
-                    found = true;
-                }
+                getAllAnnotations(clz, org.osgi.service.component.annotations.Component.class)
+                        .stream().flatMap(referenceIterableFromStandardComponentAnnotation()).forEach(r -> {
+                    callBindForStandardReference(object, instance).apply(r);
+                });
+
                 // Class references (Felix SCR)
-                for (org.apache.felix.scr.annotations.Reference reference : from(concat(
-                        from(getAllAnnotations(clz, org.apache.felix.scr.annotations.Reference.class)),
-                        from(getAllAnnotations(clz, org.apache.felix.scr.annotations.References.class))
-                                .transformAndConcat(referenceIterableFromFelixReferencesAnnotation())))) {
-                    callBindForFelixReference(object, instance).apply(reference);
-                    found = true;
-                }
+                Stream.concat(getAllAnnotations(clz, org.apache.felix.scr.annotations.References.class).stream()
+                        .flatMap(referenceIterableFromFelixReferencesAnnotation()),
+                        getAllAnnotations(clz, org.apache.felix.scr.annotations.Reference.class).stream())
+                        .forEach(r -> {
+                    callBindForFelixReference(object, instance).apply(r);
+                });
 
                 // Class references (standard OSGi)
-                for (Field f : getFieldsAnnotatedWith(clz, org.osgi.service.component.annotations.Reference.class)) {
-                    if (f.getType().isAssignableFrom(instance.getClass())) {
-                        setField(object, instance).apply(f);
-                        found = true;
-                    }
-                }
                 // Field references (Felix SCR)
-                for (Field f : getFieldsAnnotatedWith(clz, org.apache.felix.scr.annotations.Reference.class)) {
-                    if (f.getType().isAssignableFrom(instance.getClass())) {
-                        setField(object, instance).apply(f);
-                        found = true;
-                    }
-                }
+                Stream.concat(getFieldsAnnotatedWith(clz, org.osgi.service.component.annotations.Reference.class),
+                        getFieldsAnnotatedWith(clz, org.apache.felix.scr.annotations.Reference.class))
+                                .filter(f -> f.getType().isAssignableFrom(instance.getClass()))
+                        .forEach(f -> {
+                            setField(object, instance).apply(f);
+                            found.set(true);
+                        });
 
-                if (!found && clz.getSuperclass() != null && !clz.getSuperclass().equals(Object.class)) {
+                if (!found.get() && clz.getSuperclass() != null && !clz.getSuperclass().equals(Object.class)) {
                     clz = clz.getSuperclass();
                 } else {
                     clz = null;
@@ -247,8 +236,8 @@ public final class MockOsgi {
     }
 
 
-    private static FluentIterable<Class<?>> getActivatorDeactivatorTypes() {
-        return from(of(Dictionary.class, Map.class, ComponentContext.class, BundleContext.class));
+    private static Set<Class<?>> getActivatorDeactivatorTypes() {
+        return ImmutableSet.of(Dictionary.class, Map.class, ComponentContext.class, BundleContext.class);
     }
 
 
@@ -257,9 +246,9 @@ public final class MockOsgi {
         checkNotNull(param, OBJECT_MUST_BE_NON_NULL);
         checkNotNull(param, THE_CONTEXT_MUST_BE_NON_NULL);
 
-        List<Method> deactivators = copyOf(concat(
+        List<Method> deactivators = Stream.concat(
                 getMethodsAnnotatedWith(clazz, org.osgi.service.component.annotations.Deactivate.class),
-                getMethodsAnnotatedWith(clazz, org.apache.felix.scr.annotations.Deactivate.class)));
+                getMethodsAnnotatedWith(clazz, org.apache.felix.scr.annotations.Deactivate.class)).collect(Collectors.toList());
 
         checkArgument(deactivators.size() < 2, "The parameter must have zero or one deactivator (@Deactivator annotated) method.");
 
@@ -268,7 +257,7 @@ public final class MockOsgi {
         } else {
             for (Method deactivator : deactivators) {
                 checkArgument(deactivator.getParameterTypes().length == 0
-                                || !getActivatorDeactivatorTypes().filter(Predicates.assignableFrom(deactivator.getParameterTypes()[0])).isEmpty(),
+                                || getActivatorDeactivatorTypes().stream().filter(t -> t.isAssignableFrom (deactivator.getParameterTypes()[0])).collect(Collectors.toSet()).size() != 0,
                         "The deactivator (@Deactivator annotated) method must have zero or one parameter.");
 
                 if (deactivator.getParameterTypes().length == 0) {
@@ -286,9 +275,9 @@ public final class MockOsgi {
         checkNotNull(param, OBJECT_MUST_BE_NON_NULL);
         checkNotNull(param, THE_CONTEXT_MUST_BE_NON_NULL);
 
-        List<Method> activators = copyOf(concat(
+        List<Method> activators = Stream.concat(
                 getMethodsAnnotatedWith(clazz, org.osgi.service.component.annotations.Activate.class),
-                getMethodsAnnotatedWith(clazz, org.apache.felix.scr.annotations.Activate.class)));
+                getMethodsAnnotatedWith(clazz, org.apache.felix.scr.annotations.Activate.class)).collect(Collectors.toList());
 
         checkArgument(activators.size() < 2, "The parameter must have zero or one activator (@Activator annotated) method.");
 
@@ -297,7 +286,7 @@ public final class MockOsgi {
         } else {
             for (final Method activator : activators) {
                 checkArgument(activator.getParameterTypes().length == 0
-                                || !getActivatorDeactivatorTypes().filter(Predicates.assignableFrom(activator.getParameterTypes()[0])).isEmpty(),
+                                || getActivatorDeactivatorTypes().stream().filter(t -> t.isAssignableFrom (activator.getParameterTypes()[0])).collect(Collectors.toSet()).size() != 0,
                         "The activator (@Activator annotated) method must have zero or one parameter.");
                 boolean saveState = activator.isAccessible();
                 activator.setAccessible(true);
@@ -329,8 +318,8 @@ public final class MockOsgi {
      * @return Iterator of fields have the annotation
      */
 
-    private static Iterable<Field> getFieldsAnnotatedWith(final Class<?> cl, Class<? extends Annotation> annotation) {
-        return from(new Reflections(cl, new FieldAnnotationsScanner(), startWith(cl.getName())).getFieldsAnnotatedWith(annotation));
+    private static Stream<Field> getFieldsAnnotatedWith(final Class<?> cl, Class<? extends Annotation> annotation) {
+        return new Reflections(cl, new FieldAnnotationsScanner(), startWith(cl.getName())).getFieldsAnnotatedWith(annotation).stream();
     }
 
     /**
@@ -339,8 +328,8 @@ public final class MockOsgi {
      * @param annotation Annotation to find
      * @return Iterator of methods have the annotation
      */
-    private static Iterable<Method> getMethodsAnnotatedWith(final Class<?> cl, Class<? extends Annotation> annotation) {
-        return from(new Reflections(cl, new MethodAnnotationsScanner(), startWith(cl.getName())).getMethodsAnnotatedWith(annotation));
+    private static Stream<Method> getMethodsAnnotatedWith(final Class<?> cl, Class<? extends Annotation> annotation) {
+        return new Reflections(cl, new MethodAnnotationsScanner(), startWith(cl.getName())).getMethodsAnnotatedWith(annotation).stream();
     }
 
     /**
@@ -349,8 +338,8 @@ public final class MockOsgi {
      * @param <T>
      * @return
      */
-    private static <T> Predicate<String> startWith(final String prefix) {
-        return new Predicate<String>() {
+    private static <T> com.google.common.base.Predicate<String> startWith(final String prefix) {
+        return new com.google.common.base.Predicate<String>() {
             @Nullable
             @Override
             public boolean apply(@Nullable String input) {
@@ -359,8 +348,8 @@ public final class MockOsgi {
         };
     }
 
-    private static <T> Predicate<Method> methodParameterType(final String name, final Class<T> cl) {
-        return new Predicate<Method>() {
+    private static <T> com.google.common.base.Predicate<Method> methodParameterType(final String name, final Class<T> cl) {
+        return new com.google.common.base.Predicate<Method>() {
             @Nullable
             @Override
             public boolean apply(@Nullable Method input) {
@@ -393,16 +382,14 @@ public final class MockOsgi {
 
         List<T> ret = new ArrayList<>();
 
-        Iterable<T> annotation;
         if (retentionPolicy == RetentionPolicy.CLASS) {
-            annotation = FluentIterable.from(getTypeAnnotations(cl)).filter(annotationClass);
+            ret.addAll(getTypeAnnotations(cl).filter(a -> annotationClass.isAssignableFrom(a.getClass())).map(a -> annotationClass.cast(a)).collect(Collectors.toSet()));
         } else {
-            annotation = presentInstances(of(fromNullable(cl.getAnnotation(annotationClass))));
+            if (cl.getAnnotation(annotationClass) != null) {
+                ret.add(cl.getAnnotation(annotationClass));
+            }
         }
 
-        if (annotation.iterator().hasNext()) {
-            ret.addAll(from(annotation).toList());
-        }
         Class<?> superclass = cl.getSuperclass();
         if (superclass != null) {
             ret.addAll(0, getAllAnnotations(superclass, annotationClass));
@@ -420,28 +407,13 @@ public final class MockOsgi {
      * @return Iterator of annotations
      */
     @SneakyThrows({ ClassNotFoundException.class, NotFoundException.class })
-    static Iterable<Annotation> getTypeAnnotations(final Class<?> cl) {
+    static Stream<Annotation> getTypeAnnotations(final Class<?> cl) {
         ClassPool classPool = ClassPool.getDefault();
         classPool.insertClassPath(new ClassClassPath(cl));
         CtClass ctClass = classPool.get(cl.getName());
 
-        return FluentIterable
+        return Stream
                 .of(ctClass.getAnnotations())
-                .transform(cast(Annotation.class));
-    }
-
-    /**
-     * Creates a function which will cast the input to the provided class.
-     *
-     * @param resultClass class which will be used for the class
-     * @return function
-     */
-    static <T> Function<Object, T> cast(final Class<T> resultClass) {
-        return new Function<Object, T>() {
-            @Override
-            public T apply(Object input) {
-                return resultClass.cast(input);
-            }
-        };
+                .map(a -> (Annotation) a);
     }
 }

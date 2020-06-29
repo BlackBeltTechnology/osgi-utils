@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import lombok.Getter;
 import lombok.Setter;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -16,8 +17,7 @@ import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
-import static hu.blackbelt.osgi.utils.test.MockOsgi.callBindForStandardReference;
-import static hu.blackbelt.osgi.utils.test.MockOsgi.callUnbindForStandardReference;
+import static hu.blackbelt.osgi.utils.test.MockOsgi.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -96,14 +96,19 @@ public class StandardMockOsgiTest {
 
     @Test
     public void referenceIterableFromReferencesAnnotationTest() {
-        org.osgi.service.component.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromStandardComponentAnnotation().apply(MockOsgi.getAllAnnotations(T1.class, org.osgi.service.component.annotations.Component.class).get(0))).get(0);
+        org.osgi.service.component.annotations.Reference i1ref =
+                MockOsgi.getAllAnnotations(T1.class, org.osgi.service.component.annotations.Component.class).stream()
+                        .flatMap(referenceIterableFromStandardComponentAnnotation()).findFirst().get();
     }
 
 
     @Test
     public void callBindAndUnbindForReferenceTest() throws NoSuchFieldException {
         T1 t1 = new T1();
-        org.osgi.service.component.annotations.Reference i1ref = ImmutableList.copyOf(MockOsgi.referenceIterableFromStandardComponentAnnotation().apply(MockOsgi.getAllAnnotations(T1.class, org.osgi.service.component.annotations.Component.class).get(0))).get(0);
+        org.osgi.service.component.annotations.Reference i1ref =
+                MockOsgi.getAllAnnotations(T1.class, org.osgi.service.component.annotations.Component.class).stream()
+                .flatMap(referenceIterableFromStandardComponentAnnotation()).findFirst().get();
+
         assertEquals(I1.class, i1ref.service());
 
         callBindForStandardReference(t1, i1Mock).apply(i1ref);

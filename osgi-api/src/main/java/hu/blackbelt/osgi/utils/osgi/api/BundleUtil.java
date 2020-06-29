@@ -125,7 +125,7 @@ public final class BundleUtil {
             try (InputStream is = u.openStream()) {
                 String relFileName = u.getFile().substring(pathName.length());
                 File targetFile = new File(outFile.getAbsoluteFile() + File.separator + targetName + File.separator + relFileName);
-                if (is.available() > 0) {
+                if (is != null && is.available() > 0) {
                     targetFile.getParentFile().mkdirs();
                     try (OutputStream os = new FileOutputStream(targetFile)) {
                         ByteStreams.copy(is, os);

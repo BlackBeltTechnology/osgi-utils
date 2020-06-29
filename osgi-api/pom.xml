@@ -3,7 +3,7 @@
 
     <parent>
         <groupId>hu.blackbelt.osgi.utils</groupId>
-        <artifactId>parent</artifactId>
+        <artifactId>hu.blackbelt.osgi.utils.parent</artifactId>
         <version>1.0.10-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
@@ -16,8 +16,8 @@
     <properties>
         <pax.exam.framework>felix</pax.exam.framework>
         <pax.exam.logging>none</pax.exam.logging>
-        <felix.osgi.version>5.2.0</felix.osgi.version>
-        <exam.version>4.13.1</exam.version>
+        <felix.osgi.version>6.0.3</felix.osgi.version>
+        <exam.version>4.13.3</exam.version>
     </properties>
 
     <build>
@@ -49,6 +49,24 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <argLine>-Dfile.encoding=UTF-8</argLine>
+                </configuration>
+                <dependencies>
+                    <!-- https://mvnrepository.com/artifact/org.ops4j.pax.exam/pax-exam-junit4 -->
+                    <dependency>
+                        <groupId>org.ops4j.pax.exam</groupId>
+                        <artifactId>pax-exam-junit4</artifactId>
+                        <version>${exam.version}</version>
+                    </dependency>
+
+                </dependencies>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -56,10 +74,6 @@
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>osgi.cmpn</artifactId>
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>

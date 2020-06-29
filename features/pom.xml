@@ -4,7 +4,7 @@
     
     <parent>
         <groupId>hu.blackbelt.osgi.utils</groupId>
-        <artifactId>parent</artifactId>
+        <artifactId>hu.blackbelt.osgi.utils.parent</artifactId>
         <version>1.0.10-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>

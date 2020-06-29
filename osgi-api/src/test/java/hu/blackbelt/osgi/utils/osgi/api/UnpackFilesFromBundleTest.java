@@ -36,8 +36,9 @@ public class UnpackFilesFromBundleTest {
         return CoreOptions.options(
                 CoreOptions.cleanCaches(),
 
-                CoreOptions.mavenBundle().groupId("javax.annotation").artifactId("javax.annotation-api").version("1.3.2"),
-                CoreOptions.mavenBundle().groupId("com.google.guava").artifactId("guava").version("20.0"),
+                CoreOptions.mavenBundle().groupId("javax.annotation").artifactId("javax.annotation-api").version("1.3.1"),
+                CoreOptions.mavenBundle().groupId("com.google.guava").artifactId("guava").version("27.1-jre"),
+                CoreOptions.mavenBundle().groupId("com.google.guava").artifactId("failureaccess").version("1.0.1"),
 
                 CoreOptions.bundle("reference:file:target/classes"),
                 CoreOptions.bundle("reference:file:target/test-classes"),
