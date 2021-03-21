@@ -460,6 +460,7 @@
     
     <profiles>
         <profile>
+            <id>modules</id>
             <activation>
                 <property>
                     <name>github_release</name>

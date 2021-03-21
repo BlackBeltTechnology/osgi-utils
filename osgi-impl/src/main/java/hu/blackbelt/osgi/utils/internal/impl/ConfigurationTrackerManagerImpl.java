@@ -5,6 +5,7 @@ import hu.blackbelt.osgi.utils.osgi.api.ConfigurationCallback;
 import hu.blackbelt.osgi.utils.osgi.api.ConfigurationInfo;
 import hu.blackbelt.osgi.utils.osgi.api.ConfigurationInfo.ConfigEventType;
 import hu.blackbelt.osgi.utils.osgi.api.ConfigurationTrackerManager;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.InvalidSyntaxException;
@@ -151,6 +152,7 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
     }
 
 
+    @Synchronized
     private void configurationChangedInternal(ConfigurationEvent event) throws IOException {
         log.trace("Configuration event: PID={}, factory PID={}, type={}, keys={}", event.getPid(), event.getFactoryPid(), event.getType(), event.getReference() != null ? event.getReference().getPropertyKeys() : null);
         final Map<Object, Consumer<ConfigurationInfo>> callbacks;
@@ -202,7 +204,9 @@ public class ConfigurationTrackerManagerImpl implements ConfigurationTrackerMana
         try {
             return Arrays.stream(configurationAdmin.listConfigurations(null)).filter(c -> c.getPid().equals(pid)).findFirst();
         } catch (Exception ex) {
-            log.error("Invalid configuration filter", ex);
+            if (log.isTraceEnabled()) {
+                log.trace("Invalid configuration filter", ex);
+            }
         }
         return Optional.empty();
     }
