@@ -3,7 +3,7 @@
     
     <groupId>hu.blackbelt.osgi.utils</groupId>
     <artifactId>hu.blackbelt.osgi.utils.parent</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
     <packaging>pom</packaging>
     <name>OSGi utils parent project</name>
 
@@ -460,6 +460,7 @@
     
     <profiles>
         <profile>
+            <id>modules</id>
             <activation>
                 <property>
                     <name>github_release</name>
@@ -578,54 +579,38 @@
         </profile>
 
         <profile>
-            <id>release-github</id>
+            <id>generate-github-release-body</id>
+            <activation>
+                <property>
+                    <name>github_release</name>
+                    <value>true</value>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>de.jutzig</groupId>
-                        <artifactId>github-release-plugin</artifactId>
-                        <version>1.3.0</version>
-                        <inherited>false</inherited>
-                        <configuration>
-                            <repositoryId>https://github.com/BlackBeltTechnology/osgi-utils.git</repositoryId>
-                            <description>Branch: ${env.WERCKER_GIT_BRANCH} Wercker: ${env.WERCKER_RUN_URL}</description>
-                            <releaseName>${project.version}</releaseName>
-                            <deleteRelease>true</deleteRelease>
-                            <tag>${project.version}</tag>
-                            <fileSets>
-                                <fileSet>
-                                    <directory>osgi-api/target</directory>
-                                    <includes>
-                                        <include>*.jar</include>
-                                    </includes>
-                                </fileSet>
-                                <fileSet>
-                                    <directory>osgi-impl/target</directory>
-                                    <includes>
-                                        <include>*.jar</include>
-                                    </includes>
-                                </fileSet>
-                                <fileSet>
-                                    <directory>features/target/feature/</directory>
-                                    <includes>
-                                        <include>feature.xml</include>
-                                    </includes>
-                                </fileSet>
-                                <fileSet>
-                                    <directory>kar/target</directory>
-                                    <includes>
-                                        <include>*.kar</include>
-                                    </includes>
-                                </fileSet>
-                            </fileSets>
-                        </configuration>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.2.0</version>
                         <executions>
                             <execution>
-                                <id>release-to-github</id>
-                                <phase>deploy</phase>
+                                <id>template-github-release-body</id>
+                                <phase>process-resources</phase>
                                 <goals>
-                                    <goal>release</goal>
+                                    <goal>copy-resources</goal>
                                 </goals>
+                                <configuration>
+                                    <outputDirectory>${basedir}/.release</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.basedir}</directory>
+                                            <filtering>true</filtering>
+                                            <includes>
+                                                <include>.releasetemplate</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>

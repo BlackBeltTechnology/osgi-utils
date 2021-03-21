@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import hu.blackbelt.osgi.utils.osgi.api.BundleCallback;
 import hu.blackbelt.osgi.utils.osgi.api.BundleTrackerManager;
+import lombok.Synchronized;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -40,6 +41,8 @@ import static org.osgi.framework.BundleEvent.STOPPING;
  */
 @Component(immediate = true)
 public class BundleTrackerManagerImpl implements BundleTrackerManager {
+
+    private final Object lock = new Object();
 
     /**
      * This returns true if bundle is started.
@@ -89,6 +92,7 @@ public class BundleTrackerManagerImpl implements BundleTrackerManager {
         }
     }
 
+    @Synchronized("lock")
     public void bundleChangedInternal(BundleEvent event) {
         final Map<Object, Consumer<Bundle>> callbacks;
 
@@ -113,6 +117,7 @@ public class BundleTrackerManagerImpl implements BundleTrackerManager {
     }
 
     @Override
+    @Synchronized("lock")
     public void registerBundleCallback(Object key, BundleCallback registerCallback, BundleCallback unregisterCallback,
                                        Predicate<Bundle> filter) {
         bundles.put(key, Collections.synchronizedSet(new HashSet<Bundle>()));
@@ -131,6 +136,7 @@ public class BundleTrackerManagerImpl implements BundleTrackerManager {
     }
 
     @Override
+    @Synchronized("lock")
     public void unregisterBundleCallback(Object key) {
         Consumer<Bundle> registerCallback = ofNullable(registerCallbacks.get(key)).get();
         Consumer<Bundle> unregisterCallback = ofNullable(unregisterCallbacks.get(key)).get();
