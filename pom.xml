@@ -3,7 +3,7 @@
     
     <groupId>hu.blackbelt.osgi.utils</groupId>
     <artifactId>hu.blackbelt.osgi.utils.parent</artifactId>
-    <version>1.0.12-SNAPSHOT</version>
+    <version>${revision}</version>
     <packaging>pom</packaging>
     <name>OSGi utils parent project</name>
 
@@ -18,6 +18,7 @@
     
     <scm>
         <connection>scm:git:git://github.com/BlackBeltTechnology/osgi-utils.git</connection>
+        <!--suppress UnresolvedMavenProperty -->
         <developerConnection>scm:git:ssh://${git.username}@github.com:BlackBeltTechnology/osgi-utils.git
         </developerConnection>
         <url>http://github.com/BlackBeltTechnology/osgi-utils</url>
@@ -51,10 +52,11 @@
     </licenses>
     
     <properties>
+        <revision>1.0.12-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.deploy.skip>false</maven.deploy.skip>
         
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <osgi.version>6.0.0</osgi.version>
         <osgi-ds.version>1.3.0</osgi-ds.version>
         <servlet-api.version>2.5</servlet-api.version>
@@ -81,13 +83,13 @@
         <findbugs.annotations.version>3.0.1</findbugs.annotations.version>
         <qa.failOnError>true</qa.failOnError>
         
-        <lombok.version>1.18.2</lombok.version>
+        <lombok.version>1.18.22</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
         <junit.version>4.12</junit.version>
         
         <local-deploy.skip>false</local-deploy.skip>
         
-        <karaf-version>4.2.9</karaf-version>
+        <karaf-version>4.3.3</karaf-version>
         <google-karaf-features-version>1.0.3</google-karaf-features-version>
     </properties>
     
@@ -266,17 +268,6 @@
         <finalName>${project.groupId}.${project.artifactId}-${project.version}</finalName>
         
         <plugins>
-            <!--plugin>
-             <groupId>org.sonatype.plugins</groupId>
-             <artifactId>nexus-staging-maven-plugin</artifactId>
-             <version>1.6.8</version>
-             <extensions>true</extensions>
-             <configuration>
-             <serverId>ossrh</serverId>
-             <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-             <autoReleaseAfterClose>true</autoReleaseAfterClose>
-             </configuration>
-             </plugin-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-site-plugin</artifactId>
@@ -298,6 +289,31 @@
                 <version>2.9</version>
             </plugin>
 
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
         
         <pluginManagement>
@@ -312,20 +328,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-install-plugin</artifactId>
                     <version>2.5.2</version>
-                    <executions>
-                        <execution>
-                            <id>default-install</id>
-                            <configuration>
-                                <skip>${deployOnly}</skip>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>default-test</id>
-                            <configuration>
-                                <skip>${deployOnly}</skip>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 
                 <plugin>
@@ -344,13 +346,14 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>5.1.2</version>
                     <extensions>true</extensions>
                     <configuration>
                         <instructions>
                             <Bundle-Version>${project.version}</Bundle-Version>
                             <_dsannotations>*</_dsannotations>
                             <_metatypeannotations>*</_metatypeannotations>
+                            <!--suppress UnresolvedMavenProperty -->
                             <_include>${additional.manifest.file}</_include>
                             <Export-Package>
                                 ${project.groupId}.*;version=${project.version}
@@ -408,52 +411,6 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>${checkstyle.plugin.version}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.puppycrawl.tools</groupId>
-                            <artifactId>checkstyle</artifactId>
-                            <version>${checkstyle.version}</version>
-                        </dependency>
-                        <!--dependency>
-                         <groupId>com.github.sevntu.checkstyle</groupId>
-                         <artifactId>sevntu-checkstyle-maven-plugin</artifactId>
-                         <version>${sevntu.checkstyle.plugin.version}</version>
-                         </dependency-->
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-pmd-plugin</artifactId>
-                    <version>${pmd.plugin.version}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>net.sourceforge.pmd</groupId>
-                            <artifactId>pmd-core</artifactId>
-                            <version>${pmd.version}</version>
-                        </dependency>
-                        <dependency>
-                            <groupId>net.sourceforge.pmd</groupId>
-                            <artifactId>pmd-java</artifactId>
-                            <version>${pmd.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>${findbugs.plugin.version}</version>
-                    <dependencies>
-                        <dependency>
-                            <groupId>com.google.code.findbugs</groupId>
-                            <artifactId>findbugs</artifactId>
-                            <version>${findbugs.version}</version>
-                        </dependency>
-                    </dependencies>
-                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -463,7 +420,7 @@
             <id>modules</id>
             <activation>
                 <property>
-                    <name>github_release</name>
+                    <name>skipModules</name>
                     <value>!true</value>
                 </property>
             </activation>
@@ -475,7 +432,7 @@
                 <module>kar</module>
             </modules>
         </profile>
-        
+
 
 
         <profile>
@@ -494,8 +451,6 @@
                                     <goal>sign</goal>
                                 </goals>
                                 <configuration>
-                                    <keyname>${gpg.keyname}</keyname>
-                                    <passphraseServerId>${gpg.keyname}</passphraseServerId>
                                     <!-- This is necessary for gpg to not try to use the pinentry programs -->
                                     <gpgArguments>
                                         <arg>--pinentry-mode</arg>
@@ -509,16 +464,17 @@
             </build>
         </profile>
 
+
         <profile>
             <id>release-dummy</id>
             <distributionManagement>
                 <snapshotRepository>
                     <id>dummy-distribution</id>
-                    <url>file:///tmp/maven-snapshot/</url>
+                    <url>file:///tmp/${project.groupId}-${project.artifactId}-${project.version}/maven-snapshot/</url>
                 </snapshotRepository>
                 <repository>
                     <id>dummy-distribution</id>
-                    <url>file:///tmp/maven-release/</url>
+                    <url>file:///tmp/${project.groupId}-${project.artifactId}-${project.version}/maven-release/</url>
                 </repository>
             </distributionManagement>
         </profile>
@@ -528,11 +484,11 @@
             <distributionManagement>
                 <snapshotRepository>
                     <id>judong-nexus-distribution</id>
-                    <url>${env.JUDONG_MAVEN_UPSTREAM_SNAPSHOT}</url>
+                    <url>https://nexus.judo.technology/repository/maven-judong-snapshots/</url>
                 </snapshotRepository>
                 <repository>
                     <id>judong-nexus-distribution</id>
-                    <url>${env.JUDONG_MAVEN_UPSTREAM_RELEASE}</url>
+                    <url>https://nexus.judo.technology/repository/maven-judong-snapshots/</url>
                 </repository>
             </distributionManagement>
         </profile>
@@ -576,46 +532,6 @@
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
             </distributionManagement>
-        </profile>
-
-        <profile>
-            <id>generate-github-release-body</id>
-            <activation>
-                <property>
-                    <name>github_release</name>
-                    <value>true</value>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <version>3.2.0</version>
-                        <executions>
-                            <execution>
-                                <id>template-github-release-body</id>
-                                <phase>process-resources</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>${basedir}/.release</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.basedir}</directory>
-                                            <filtering>true</filtering>
-                                            <includes>
-                                                <include>.releasetemplate</include>
-                                            </includes>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
     </profiles>
 
