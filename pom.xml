@@ -90,7 +90,7 @@
         <local-deploy.skip>false</local-deploy.skip>
         
         <karaf-version>4.3.3</karaf-version>
-        <google-karaf-features-version>1.0.3</google-karaf-features-version>
+        <google-karaf-features-version>1.0.7</google-karaf-features-version>
     </properties>
     
     <dependencies>
