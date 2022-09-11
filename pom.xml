@@ -485,7 +485,7 @@
                 </plugins>
             </build>
         </profile>
-        
+
         <profile>
             <id>release-dummy</id>
             <distributionManagement>
