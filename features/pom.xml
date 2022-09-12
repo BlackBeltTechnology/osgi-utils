@@ -41,16 +41,6 @@
                     <enableGeneration>true</enableGeneration>
                     <aggregateFeatures>true</aggregateFeatures>
                 </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.karaf.tooling</groupId>
-                <artifactId>karaf-maven-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <enableGeneration>true</enableGeneration>
-                    <aggregateFeatures>true</aggregateFeatures>
-                </configuration>
                 <executions>
                     <execution>
                         <id>feature-verify</id>
