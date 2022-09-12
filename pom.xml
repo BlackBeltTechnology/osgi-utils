@@ -68,7 +68,7 @@
         <mockito.version>1.10.19</mockito.version>
         <felix-scr-annotations.version>1.12.0</felix-scr-annotations.version>
         <functionaljava.version>4.3</functionaljava.version>
-        <javassist.version>3.19.0-GA</javassist.version>
+        <javassist.version>3.29.1-GA</javassist.version>
 
         <lombok.version>1.18.22</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
