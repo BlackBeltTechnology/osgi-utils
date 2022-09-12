@@ -4,8 +4,7 @@
     <parent>
         <groupId>hu.blackbelt.osgi.utils</groupId>
         <artifactId>hu.blackbelt.osgi.utils.parent</artifactId>
-        <version>1.0.11</version>
-        <relativePath>../</relativePath>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>osgi-test</artifactId>

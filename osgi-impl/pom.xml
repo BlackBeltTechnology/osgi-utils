@@ -4,8 +4,7 @@
     <parent>
         <groupId>hu.blackbelt.osgi.utils</groupId>
         <artifactId>hu.blackbelt.osgi.utils.parent</artifactId>
-        <version>1.0.11</version>
-        <relativePath>../</relativePath>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>osgi-impl</artifactId>
@@ -14,10 +13,7 @@
     <name>OSGI utils implementation</name>
 
     <properties>
-        <pax.exam.framework>felix</pax.exam.framework>
-        <pax.exam.logging>none</pax.exam.logging>
-        <felix.osgi.version>5.2.0</felix.osgi.version>
-        <exam.version>4.13.3</exam.version>
+
     </properties>
 
     <build>
@@ -26,47 +22,12 @@
             <plugin>
                 <groupId>org.apache.servicemix.tooling</groupId>
                 <artifactId>depends-maven-plugin</artifactId>
-                <version>1.4.0</version>
-                <executions>
-                    <execution>
-                        <id>generate-depends-file</id>
-                        <goals>
-                            <goal>generate-depends-file</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Import-Package>
-                            javax.annotation;version="[1.0,2)",
-                            !lombok,
-                            *
-                        </Import-Package>
-                    </instructions>
-                </configuration>
             </plugin>
-
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
-                <configuration>
-                    <argLine>-Dfile.encoding=UTF-8</argLine>
-                </configuration>
-                <dependencies>
-                    <!-- https://mvnrepository.com/artifact/org.ops4j.pax.exam/pax-exam-junit4 -->
-                    <dependency>
-                        <groupId>org.ops4j.pax.exam</groupId>
-                        <artifactId>pax-exam-junit4</artifactId>
-                        <version>${exam.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
         </plugins>
     </build>
 
@@ -116,38 +77,11 @@
         </dependency>
 
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <!--
-         <dependency>
-         <groupId>org.ops4j.pax.exam</groupId>
-         <artifactId>pax-exam-junit4</artifactId>
-         <version>4.8.0</version>
-         <scope>test</scope>
-         </dependency>
-         -->
-        <dependency>
             <groupId>org.apache.felix</groupId>
             <artifactId>org.apache.felix.framework</artifactId>
             <version>${felix.osgi.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>1.1.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>1.1.2</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.ops4j.pax.exam</groupId>
             <artifactId>pax-exam-container-native</artifactId>

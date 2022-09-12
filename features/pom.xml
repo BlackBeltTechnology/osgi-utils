@@ -5,8 +5,7 @@
     <parent>
         <groupId>hu.blackbelt.osgi.utils</groupId>
         <artifactId>hu.blackbelt.osgi.utils.parent</artifactId>
-        <version>1.0.11</version>
-        <relativePath>../</relativePath>
+        <version>${revision}</version>
     </parent>
     <artifactId>features</artifactId>
     <packaging>feature</packaging>
@@ -42,16 +41,6 @@
                     <enableGeneration>true</enableGeneration>
                     <aggregateFeatures>true</aggregateFeatures>
                 </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.karaf.tooling</groupId>
-                <artifactId>karaf-maven-plugin</artifactId>
-                <extensions>true</extensions>
-                <configuration>
-                    <enableGeneration>true</enableGeneration>
-                    <aggregateFeatures>true</aggregateFeatures>
-                </configuration>
                 <executions>
                     <execution>
                         <id>feature-verify</id>
@@ -67,7 +56,7 @@
                                 <descriptor>file:${project.build.directory}/feature/feature.xml</descriptor>
                             </descriptors>
                             <distribution>org.apache.karaf.features:framework</distribution>
-                            <javase>1.8</javase>
+                            <javase>11</javase>
                             <framework>
                                 <feature>framework</feature>
                                 <feature>shell-compat</feature>
