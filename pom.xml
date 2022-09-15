@@ -84,7 +84,7 @@
         <local-deploy.skip>false</local-deploy.skip>
         
         <karaf-version>4.3.3</karaf-version>
-        <google-karaf-features-version>1.0.7</google-karaf-features-version>
+        <karaf-features-version>2.0.0</karaf-features-version>
 
         <surefire-version>3.0.0-M7</surefire-version>
         <!--suppress UnresolvedMavenProperty -->
