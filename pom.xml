@@ -84,7 +84,7 @@
         <local-deploy.skip>false</local-deploy.skip>
         
         <karaf-version>4.3.3</karaf-version>
-        <karaf-features-version>2.0.0</karaf-features-version>
+        <karaf-features-version>2.0.1.20220926_213446_a786c6cc_develop</karaf-features-version>
 
         <surefire-version>3.0.0-M7</surefire-version>
         <!--suppress UnresolvedMavenProperty -->
@@ -663,7 +663,7 @@
                                         <toc>left</toc>
                                         <icons>font</icons>
                                         <sectanchors>true</sectanchors>
-                                        <idprefix/>
+                                        <idprefix />
                                         <idseparator>-</idseparator>
                                     </attributes>
                                 </configuration>
