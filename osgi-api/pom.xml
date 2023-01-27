@@ -30,6 +30,11 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>hu.blackbelt.osgi.utils.osgi.api</Export-Package>
+                    </instructions>
+                </configuration>
             </plugin>
         </plugins>
     </build>

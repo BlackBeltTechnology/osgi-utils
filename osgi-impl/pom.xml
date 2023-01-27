@@ -27,6 +27,11 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <Export-Package>hu.blackbelt.osgi.utils.internal.impl</Export-Package>
+                    </instructions>
+                </configuration>
             </plugin>
         </plugins>
     </build>
