@@ -67,7 +67,7 @@
         <hamcrest.version>2.0.0.0</hamcrest.version>
         <mockito.version>1.10.19</mockito.version>
         <felix-scr-annotations.version>1.12.0</felix-scr-annotations.version>
-        <functionaljava.version>4.3</functionaljava.version>
+        <functionaljava.version>5.0</functionaljava.version>
         <javassist.version>3.19.0-GA</javassist.version>
 
         <lombok.version>1.18.22</lombok.version>
