@@ -25,7 +25,7 @@
     xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.5.0 http://karaf.apache.org/xmlns/features/v1.5.0">
     
     <feature name="osgi-utils" version="${project.version}" description="Blackbelt OSGi utils" install="false">
-        <feature>guava-27</feature>
+        <feature>guava-30</feature>
         <feature dependency="true">scr</feature>
         <bundle>mvn:hu.blackbelt.osgi.utils/osgi-api/${project.version}</bundle>
         <bundle>mvn:hu.blackbelt.osgi.utils/osgi-impl/${project.version}</bundle>
