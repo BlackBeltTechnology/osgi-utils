@@ -74,7 +74,7 @@
         <functionaljava.version>4.3</functionaljava.version>
         <javassist.version>3.19.0-GA</javassist.version>
 
-        <lombok.version>1.18.22</lombok.version>
+        <lombok.version>1.18.34</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
         <junit.version>4.13</junit.version>
 
@@ -93,6 +93,7 @@
         <surefire-version>3.5.1</surefire-version>
         <!--suppress UnresolvedMavenProperty -->
         <logback-test-config>${maven.multiModuleProjectDirectory}/logback-test.xml</logback-test-config>
+        <logback-version>1.5.12</logback-version>
 
         <!-- Code Quality-->
         <sonar-maven-plugin-version>3.9.1.2184</sonar-maven-plugin-version>
@@ -118,7 +119,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
+            <version>${logback-version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -386,7 +387,7 @@
                     <dependency>
                         <groupId>org.projectlombok</groupId>
                         <artifactId>lombok</artifactId>
-                        <version>1.18.24</version>
+                        <version>${lombok.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
