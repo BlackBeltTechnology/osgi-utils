@@ -74,7 +74,7 @@
         <functionaljava.version>4.3</functionaljava.version>
         <javassist.version>3.19.0-GA</javassist.version>
 
-        <lombok.version>1.18.22</lombok.version>
+        <lombok.version>1.18.34</lombok.version>
         <slf4j.version>1.7.25</slf4j.version>
         <junit.version>4.13</junit.version>
 
@@ -88,11 +88,12 @@
         <local-deploy.skip>false</local-deploy.skip>
         
         <karaf-version>4.4.5</karaf-version>
-        <karaf-features-version>2.0.2.20240410_083849_8b6fbfb2_develop</karaf-features-version>
+        <karaf-features-version>2.0.2.20241126_153048_85d3e09c_feature_JNG_5995_UpdateEclipse</karaf-features-version>
 
-        <surefire-version>3.0.0-M7</surefire-version>
+        <surefire-version>3.5.1</surefire-version>
         <!--suppress UnresolvedMavenProperty -->
         <logback-test-config>${maven.multiModuleProjectDirectory}/logback-test.xml</logback-test-config>
+        <logback-version>1.5.12</logback-version>
 
         <!-- Code Quality-->
         <sonar-maven-plugin-version>3.9.1.2184</sonar-maven-plugin-version>
@@ -100,7 +101,7 @@
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
         <sonar.language>java</sonar.language>
         <sonar.java.source>${java.version}</sonar.java.source>
-        <jacoco.version>0.8.8</jacoco.version>
+        <jacoco.version>0.8.12</jacoco.version>
 
     </properties>
     
@@ -118,7 +119,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
+            <version>${logback-version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -386,7 +387,7 @@
                     <dependency>
                         <groupId>org.projectlombok</groupId>
                         <artifactId>lombok</artifactId>
-                        <version>1.18.24</version>
+                        <version>${lombok.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
