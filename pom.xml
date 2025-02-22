@@ -264,6 +264,21 @@
                 <scope>test</scope>
                 <optional>true</optional>
             </dependency>
+            <dependency>
+                <groupId>hu.blackbelt.osgi.utils</groupId>
+                <artifactId>osgi-api</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>hu.blackbelt.osgi.utils</groupId>
+                <artifactId>osgi-impl</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>hu.blackbelt.osgi.utils</groupId>
+                <artifactId>osgi-test</artifactId>
+                <version>${project.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     

@@ -95,5 +95,13 @@
             <scope>runtime</scope>
             <version>${karaf-features-version}</version>
         </dependency>
+        <dependency>
+            <groupId>hu.blackbelt.osgi.utils</groupId>
+            <artifactId>osgi-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>hu.blackbelt.osgi.utils</groupId>
+            <artifactId>osgi-impl</artifactId>
+        </dependency>
     </dependencies>
 </project>
