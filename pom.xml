@@ -88,7 +88,7 @@
         <local-deploy.skip>false</local-deploy.skip>
         
         <karaf-version>4.4.7</karaf-version>
-        <karaf-features-version>2.0.2.20250806_004748_d0c312c1_develop</karaf-features-version>
+        <karaf-features-version>2.0.2.20250818_010007_6dbbe9be_feature_JNG_6322_Minimiize_Karaf_Size</karaf-features-version>
 
         <surefire-version>3.5.1</surefire-version>
         <!--suppress UnresolvedMavenProperty -->
