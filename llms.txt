@@ -27,6 +27,39 @@ Key facts:
 - [kar/pom.xml](kar/pom.xml): Karaf KAR archive assembly for deployment
 - [reports/pom.xml](reports/pom.xml): JaCoCo aggregate code coverage reports
 
+## Depends on
+
+- [karaf-features](../../packages/karaf-features): packages/karaf-features
+
+## Used by
+
+- [judo-meta-asm](../../models/judo-meta-asm): models/judo-meta-asm
+- [judo-meta-esm](../../models/judo-meta-esm): models/judo-meta-esm
+- [judo-meta-expression](../../models/judo-meta-expression): models/judo-meta-expression
+- [judo-meta-expression-asm](../../models/judo-meta-expression-asm): models/judo-meta-expression-asm
+- [judo-meta-expression-esm](../../models/judo-meta-expression-esm): models/judo-meta-expression-esm
+- [judo-meta-expression-psm](../../models/judo-meta-expression-psm): models/judo-meta-expression-psm
+- [judo-meta-jcl](../../models/judo-meta-jcl): models/judo-meta-jcl
+- [judo-meta-jql](../../models/judo-meta-jql): models/judo-meta-jql
+- [judo-meta-jsl](../../models/judo-meta-jsl): models/judo-meta-jsl
+- [judo-meta-keycloak](../../models/judo-meta-keycloak): models/judo-meta-keycloak
+- [judo-meta-liquibase](../../models/judo-meta-liquibase): models/judo-meta-liquibase
+- [judo-meta-measure](../../models/judo-meta-measure): models/judo-meta-measure
+- [judo-meta-openapi](../../models/judo-meta-openapi): models/judo-meta-openapi
+- [judo-meta-psm](../../models/judo-meta-psm): models/judo-meta-psm
+- [judo-meta-query](../../models/judo-meta-query): models/judo-meta-query
+- [judo-meta-rdbms](../../models/judo-meta-rdbms): models/judo-meta-rdbms
+- [judo-meta-script](../../models/judo-meta-script): models/judo-meta-script
+- [judo-meta-ui](../../models/judo-meta-ui): models/judo-meta-ui
+- [judo-platform](../judo-platform): runtime/judo-platform
+- [judo-rdbms-schema](../judo-rdbms-schema): runtime/judo-rdbms-schema
+- [judo-services](../judo-services): runtime/judo-services
+- [judo-tatami](../judo-tatami): runtime/judo-tatami
+- [osgi-filestore](../osgi-filestore): runtime/osgi-filestore
+- [osgi-i18n](../osgi-i18n): runtime/osgi-i18n
+- [osgi-validator](../osgi-validator): runtime/osgi-validator
+- [solr-osgi](../solr-osgi): runtime/solr-osgi
+
 ## Optional
 
 - [.github/workflows/build.yml](.github/workflows/build.yml): GitHub Actions CI/CD pipeline
