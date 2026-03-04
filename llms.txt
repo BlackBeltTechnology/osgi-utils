@@ -1,0 +1,33 @@
+# OSGi Utils
+
+> A Java utility library that simplifies common OSGi tasks — bundle lifecycle tracking, configuration change monitoring, ranked service caching, bundle utilities, and reflection-based mock testing without a running container.
+
+Key facts:
+- Java 21 (compile) / Java 17 (runtime target), OSGi Core 6.0 / Compendium 6.0
+- Maven multi-module project, 6 modules (3 code + 3 packaging)
+- OSGi Declarative Services, Google Guava 30, Lombok, Apache Karaf 4.4.7
+- Build with Maven Wrapper (`./mvnw clean install`)
+- License: Apache License 2.0
+
+## Docs
+
+- [README.md](README.md): Project overview with architecture diagrams and build instructions
+- [AGENTS.md](AGENTS.md): Developer guide with module details, build commands, technology stack, and coding conventions
+- [CONTRIBUTING.md](CONTRIBUTING.md): Contribution guidelines
+
+## Modules — Core
+
+- [osgi-api/pom.xml](osgi-api/pom.xml): Public API — interfaces (BundleTrackerManager, ConfigurationTrackerManager), utilities (BundleUtil, PropertiesUtil), service caches (ServiceCache, ServiceCacheByProperty), and data types
+- [osgi-impl/pom.xml](osgi-impl/pom.xml): OSGi DS component implementations — BundleTrackerManagerImpl (synchronous bundle listener), ConfigurationTrackerManagerImpl (synchronous configuration listener), OsgiUtil
+- [osgi-test/pom.xml](osgi-test/pom.xml): MockOsgi testing utility — activates/deactivates components and binds/unbinds @Reference dependencies via reflection without a running OSGi container
+
+## Modules — Packaging
+
+- [features/src/main/feature/feature.xml](features/src/main/feature/feature.xml): Karaf feature descriptor bundling osgi-api, osgi-impl with guava-30 and scr dependencies
+- [kar/pom.xml](kar/pom.xml): Karaf KAR archive assembly for deployment
+- [reports/pom.xml](reports/pom.xml): JaCoCo aggregate code coverage reports
+
+## Optional
+
+- [.github/workflows/build.yml](.github/workflows/build.yml): GitHub Actions CI/CD pipeline
+- [.github/CIFLOW.md](.github/CIFLOW.md): CI/CD workflow documentation with branch strategy
