@@ -29,36 +29,36 @@ Key facts:
 
 ## Depends on
 
-- [karaf-features](../../packages/karaf-features): packages/karaf-features
+- [karaf-features](../../packages/karaf-features): Apache Karaf feature descriptors for 20+ third-party libraries
 
 ## Used by
 
-- [judo-meta-asm](../../models/judo-meta-asm): models/judo-meta-asm
-- [judo-meta-esm](../../models/judo-meta-esm): models/judo-meta-esm
-- [judo-meta-expression](../../models/judo-meta-expression): models/judo-meta-expression
-- [judo-meta-expression-asm](../../models/judo-meta-expression-asm): models/judo-meta-expression-asm
-- [judo-meta-expression-esm](../../models/judo-meta-expression-esm): models/judo-meta-expression-esm
-- [judo-meta-expression-psm](../../models/judo-meta-expression-psm): models/judo-meta-expression-psm
-- [judo-meta-jcl](../../models/judo-meta-jcl): models/judo-meta-jcl
-- [judo-meta-jql](../../models/judo-meta-jql): models/judo-meta-jql
-- [judo-meta-jsl](../../models/judo-meta-jsl): models/judo-meta-jsl
-- [judo-meta-keycloak](../../models/judo-meta-keycloak): models/judo-meta-keycloak
-- [judo-meta-liquibase](../../models/judo-meta-liquibase): models/judo-meta-liquibase
-- [judo-meta-measure](../../models/judo-meta-measure): models/judo-meta-measure
-- [judo-meta-openapi](../../models/judo-meta-openapi): models/judo-meta-openapi
-- [judo-meta-psm](../../models/judo-meta-psm): models/judo-meta-psm
-- [judo-meta-query](../../models/judo-meta-query): models/judo-meta-query
-- [judo-meta-rdbms](../../models/judo-meta-rdbms): models/judo-meta-rdbms
-- [judo-meta-script](../../models/judo-meta-script): models/judo-meta-script
-- [judo-meta-ui](../../models/judo-meta-ui): models/judo-meta-ui
-- [judo-platform](../judo-platform): runtime/judo-platform
-- [judo-rdbms-schema](../judo-rdbms-schema): runtime/judo-rdbms-schema
-- [judo-services](../judo-services): runtime/judo-services
-- [judo-tatami](../judo-tatami): runtime/judo-tatami
-- [osgi-filestore](../osgi-filestore): runtime/osgi-filestore
-- [osgi-i18n](../osgi-i18n): runtime/osgi-i18n
-- [osgi-validator](../osgi-validator): runtime/osgi-validator
-- [solr-osgi](../solr-osgi): runtime/solr-osgi
+- [judo-meta-asm](../../models/judo-meta-asm): ASM metamodel — Ecore-based architecture model with builders and validation
+- [judo-meta-esm](../../models/judo-meta-esm): ESM metamodel — business entities, operations, access points, and UI structures
+- [judo-meta-expression](../../models/judo-meta-expression): Expression metamodel — type-safe numeric, string, temporal, and collection expressions
+- [judo-meta-expression-asm](../../models/judo-meta-expression-asm): Bridges Expression metamodel with ASM for symbolic reference resolution
+- [judo-meta-expression-esm](../../models/judo-meta-expression-esm): Bridges Expression metamodel with ESM for expression evaluation and validation
+- [judo-meta-expression-psm](../../models/judo-meta-expression-psm): Bridges Expression metamodel with PSM for type resolution and measurement support
+- [judo-meta-jcl](../../models/judo-meta-jcl): JCL metamodel — typed expression and statement DSL extending JQL
+- [judo-meta-jql](../../models/judo-meta-jql): JQL metamodel — Xtext-based declarative query language
+- [judo-meta-jsl](../../models/judo-meta-jsl): JSL language toolchain — grammar, parser, validator, code generator, and LSP servers
+- [judo-meta-keycloak](../../models/judo-meta-keycloak): Keycloak IAM configuration metamodel
+- [judo-meta-liquibase](../../models/judo-meta-liquibase): Liquibase database change management metamodel
+- [judo-meta-measure](../../models/judo-meta-measure): SI units metamodel — measures, units, and conversion rates
+- [judo-meta-openapi](../../models/judo-meta-openapi): OpenAPI 2.0 metamodel with bidirectional JSON/YAML transformation
+- [judo-meta-psm](../../models/judo-meta-psm): PSM metamodel — foundational platform-specific data model
+- [judo-meta-query](../../models/judo-meta-query): Query metamodel — expression-based RDBMS query generation
+- [judo-meta-rdbms](../../models/judo-meta-rdbms): RDBMS schema metamodel with incremental evolution tracking
+- [judo-meta-script](../../models/judo-meta-script): Script metamodel — typed scripting language with ASM/ESM adapters
+- [judo-meta-ui](../../models/judo-meta-ui): UI metamodel — pages, containers, tables, inputs, and data bindings
+- [judo-platform](../judo-platform): Model-driven OSGi runtime platform with REST APIs and Karaf deployment
+- [judo-rdbms-schema](../judo-rdbms-schema): Incremental database schema migration via RDBMS model comparison
+- [judo-services](../judo-services): OSGi runtime services enabling multiple data models in a single Karaf container
+- [judo-tatami](../judo-tatami): Model transformation pipeline — ESM/PSM to deployable application artifacts
+- [osgi-filestore](../osgi-filestore): Unified blob storage service with pluggable backends (RDBMS, filesystem, S3)
+- [osgi-i18n](../osgi-i18n): Internationalization via JDK dynamic proxies and .properties files
+- [osgi-validator](../osgi-validator): Hibernate Validator wrapped as OSGi Declarative Services component
+- [solr-osgi](../solr-osgi): Embedded Apache Solr inside OSGi with dynamic core management
 
 ## Optional
 
