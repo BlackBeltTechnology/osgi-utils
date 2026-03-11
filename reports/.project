@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>osgi-api</name>
+	<name>hu.blackbelt.osgi.utils-osgi-utils-reports</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -22,7 +22,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1761313513625</id>
+			<id>1761313513635</id>
 			<name></name>
 			<type>30</type>
 			<matcher>
